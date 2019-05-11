@@ -6,6 +6,7 @@ from sprite import Sprite
 
 import random
 
+
 def get_plant_card_path(plants):
     # Возвращает список с путями к изоюбражениям
     paths = []

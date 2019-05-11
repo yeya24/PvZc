@@ -8,23 +8,23 @@ sun_speedX = (-0.8, 0.8)
 sun_speedY = 3
 
 sizes = {
-    "win":     {
+    "win":        {
         "w": 830,
         "h": 623
     },
-    "topmenu": {
+    "topmenu":    {
         "w": 500,
         "h": 100
     },
-    "cell":    {
+    "cell":       {
         "w": 67,
         "h": 72
     },
-    "card":    {
+    "card":       {
         "w": 60,
         "h": 82
     },
-    "sun": {
+    "sun":        {
         "w": 60,
         "h": 60
     },
@@ -115,28 +115,28 @@ plants = {
 }
 
 zombies = {
-    "NormalZombie":    {
-        "hp": 200,
+    "NormalZombie":       {
+        "hp":    200,
         "speed": 25,
 
     },
-    "FlagZombie":    {
-        "hp": 200,
+    "FlagZombie":         {
+        "hp":    200,
         "speed": 25,
 
     },
-    "ConeHeadZombie": {
-        "hp": 560,
+    "ConeHeadZombie":     {
+        "hp":    560,
         "speed": 25,
 
     },
     "PoleVaultingZombie": {
-        "hp": 340,
+        "hp":    340,
         "speed": 25,
 
     },
-    "BucketHeadZombie": {
-        "hp": 1300,
+    "BucketHeadZombie":   {
+        "hp":    1300,
         "speed": 25,
 
     },
