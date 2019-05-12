@@ -1,28 +1,24 @@
 import pygame
-from pygame.locals import *
 
 from config import *
 
 from sprite import Sprite
 from other import Sun
 
+# Чтобы у локации был доступ к изображению выбранного растения
 plant_images = {
     name: pygame.image.load(f"assets/images/{name.lower()}.png")
     for name in plants.keys()
 }
 map(pygame.Surface.convert_alpha, plant_images.values())
 
-projectile_images = {
-    "PeashooterProjectile": pygame.image.load("assets/images/peashooterprojectile.png")
-}
-map(pygame.Surface.convert_alpha, projectile_images.values())
-
 
 class Plant(Sprite):
+    chars = {}
     counter = 0
 
     def __init__(self, cell, hp, image, size=None):
-        # Расположение в центре клетки (при размере растения меньше размера клетки)
+        # Расположение в центре клетки
         super().__init__(cell.rect.x + (sizes["cell"]["w"] - image.get_width()) / 2,
                          cell.rect.y + (sizes["cell"]["h"] - image.get_height()) / 2,
                          image, size)
@@ -31,7 +27,6 @@ class Plant(Sprite):
         self.hp = hp
 
     def take_damage(self, enemy):
-        # TODO нанесение урона врагу
         pass
 
 
@@ -142,7 +137,8 @@ class PeashooterProjectile(Projectile):
 
     def __init__(self, x, y):
         super().__init__(x + 5, y + 5, 6, 20,
-                         projectile_images["PeashooterProjectile"],
+                         pygame.image.load("assets/images/peashooterprojectile.png").
+                         convert_alpha(),
                          size=tuple(sizes["projectile"].values()))
 
 

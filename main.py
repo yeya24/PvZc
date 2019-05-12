@@ -1,7 +1,8 @@
 import pygame
 from pygame.locals import *
 
-from locations import *
+from locations import GameLocation  # StartLocation
+from plants import PeaShooter, Sunflower  # delete
 
 import sys
 
@@ -25,7 +26,7 @@ class Game:
         pygame.display.update()
 
     def draw(self):
-        self.location.draw()
+        self.location.update()
         pygame.display.flip()
         for event in pygame.event.get():
             self.location.event(event)
@@ -50,7 +51,7 @@ PvZ
 |  |
 |  ├──GameLocation
 |  |
-|  ├──ChooseLocation
+|  ├──LevelPreparationLocation
 |  |
 |  ├──MoveLocation
 |  |
@@ -59,8 +60,6 @@ PvZ
 ├──Sprite
 |  ├──Tile
 |  |  ├──Grass
-|  |  |
-|  |  ├──Water
 |  |  .
 |  ├──Plant
 |  |  ├──Peashooter

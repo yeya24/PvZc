@@ -1,6 +1,3 @@
-import pygame
-from pygame.locals import *
-
 from config import *
 
 from sprite import Sprite
@@ -28,7 +25,7 @@ class Tile(Sprite):
 
     def plant(self, plant, suns):
         if self.can_build and self.on_top is None:
-            # Подсолныхам нужен доступ к группе солнц
+            # Подсолнухам нужен доступ к группе солнц
             if plant.__name__ == "Sunflower":
                 self.on_top = plant(self, suns)
             else:

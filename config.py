@@ -3,9 +3,12 @@ fps = 60
 YCells = 5
 XCells = 9
 
+sun_drop_delay = 10
+
 starting_sun = 50
-sun_speedX = (-0.8, 0.8)
-sun_speedY = 3
+sun_speedY = 1.5
+
+# normalZombie 91px, height: 155px
 
 sizes = {
     "win":        {
@@ -81,11 +84,11 @@ plants = {
 
     },
     "PotatoMine": {
-        "sunCost":    25,
-        "toughness":  300,
-        "recharge":   20,
-        "armingTime": 14,
-        "damage":     1800,
+        "sunCost":   25,
+        "toughness": 300,
+        "recharge":  20,
+        "damage":    1800,
+        "reload":    14,
 
     },
     "SnowPea":    {
@@ -117,27 +120,27 @@ plants = {
 zombies = {
     "NormalZombie":       {
         "hp":    200,
-        "speed": 25,
+        "speed": 1 / 3,
 
     },
     "FlagZombie":         {
         "hp":    200,
-        "speed": 25,
+        "speed": 1 / 3,
 
     },
     "ConeHeadZombie":     {
         "hp":    560,
-        "speed": 25,
+        "speed": 1 / 3,
 
     },
     "PoleVaultingZombie": {
         "hp":    340,
-        "speed": 25,
+        "speed": 1,
 
     },
     "BucketHeadZombie":   {
         "hp":    1300,
-        "speed": 25,
+        "speed": 1 / 3,
 
     },
 }

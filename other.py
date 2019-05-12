@@ -4,16 +4,6 @@ from pygame.locals import *
 from config import *
 from sprite import Sprite
 
-import random
-
-
-def get_plant_card_path(plants):
-    # Возвращает список с путями к изоюбражениям
-    paths = []
-    for plant in plants:
-        paths.append(f"assets/images/card_{plant.__name__.lower()}.png")
-    return paths
-
 
 def get_transparent_image(image, alpha=128):
     im = image.copy()
@@ -37,9 +27,9 @@ class TopMenu:
 
         self.cards = pygame.sprite.Group()
         x = pads["menubar"]["x"] + pads["sun"]["x"]
-        for path, plant in zip(get_plant_card_path(cards), cards):
-            image = pygame.image.load(path).convert()
-            s = Card(x, plant, image=image, size=tuple(sizes["card"].values()))
+        for card in cards:
+            image = pygame.image.load(f"assets/images/card_{card.__name__.lower()}.png").convert()
+            s = Card(x, card, image=image, size=tuple(sizes["card"].values()))
             self.cards.add(s)
 
             x += sizes["card"]["w"] + pads["cards"]
@@ -86,10 +76,9 @@ class Sun(Sprite):
 
         self.despawn_time = fps * 20
         self.max_y = max_y
-        self.speedx = 0
+        self.speedx = self.up_go = 0
         if sunflower:
             self.up_go = (max_y - y) // self.speedy  # Поднимается до верхней границы клетки
-            self.speedx = random.choice(sun_speedX)
 
     def update(self, screen):
         if self.up_go:
@@ -107,3 +96,15 @@ class Sun(Sprite):
                 self.kill()
 
         self._draw(screen)
+
+
+class LawnMover(Sprite):
+    pass
+
+
+class StageIndicator(Sprite):
+    pass
+
+
+class MenuButton(Sprite):
+    pass
