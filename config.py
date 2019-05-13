@@ -11,46 +11,43 @@ sun_speedY = 1.5
 # normalZombie 91px, height: 155px
 
 sizes = {
-    "win":        {
-        "w": 830,
-        "h": 623
-    },
-    "topmenu":    {
-        "w": 500,
-        "h": 100
-    },
-    "cell":       {
-        "w": 67,
-        "h": 72
-    },
-    "card":       {
-        "w": 60,
-        "h": 82
-    },
-    "sun":        {
-        "w": 60,
-        "h": 60
-    },
-    "projectile": {
-        "w": 20,
-        "h": 20
-    },
+    "win":        (
+        830, 623
+    ),
+    "topmenu":    (
+        500, 100
+    ),
+    "cell":       (
+        67, 72
+    ),
+    "card":       (
+        60, 82
+    ),
+    "sun":        (
+        60, 60
+    ),
+    "projectile": (
+        20, 20
+    ),
+    "zombie":     (
+        72, 124
+    ),
+    "plant": (
+        62, 62
+    )
 
 }
 
 pads = {
-    "game":    {
-        "x": 213,
-        "y": 170
-    },
-    "sun":     {
-        "x": 85,
-        "y": 70
-    },
-    "menubar": {
-        "x": 100,
-        "y": 0
-    },
+    "game":    (
+        213, 170
+    ),
+    "sun":     (
+        85, 70
+    ),
+    "menubar": (
+        100, 0
+    ),
     "cards":   10
 
 }
@@ -120,17 +117,17 @@ plants = {
 zombies = {
     "NormalZombie":       {
         "hp":    200,
-        "speed": 1 / 3,
+        "speed": 1 / 7,
 
     },
     "FlagZombie":         {
         "hp":    200,
-        "speed": 1 / 3,
+        "speed": 1 / 8,
 
     },
     "ConeHeadZombie":     {
         "hp":    560,
-        "speed": 1 / 3,
+        "speed": 1 / 8,
 
     },
     "PoleVaultingZombie": {
@@ -140,7 +137,7 @@ zombies = {
     },
     "BucketHeadZombie":   {
         "hp":    1300,
-        "speed": 1 / 3,
+        "speed": 1 / 8,
 
     },
 }

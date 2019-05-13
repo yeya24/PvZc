@@ -5,10 +5,9 @@ class Sprite(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image=None, size=None):
         super().__init__()
-        # Позиция изображения
         if image is not None:
             if size is not None:
-                image = pygame.transform.scale(image, size)
+                image = pygame.transform.smoothscale(image, size)
             self.image = image
         else:
             self.image = pygame.Surface(size)

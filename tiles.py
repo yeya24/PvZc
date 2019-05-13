@@ -5,10 +5,9 @@ from sprite import Sprite
 
 class Tile(Sprite):
     def __init__(self, col, row, can_build):
-        # TODO настроить положение с учетом рамки
-        super().__init__(x=col * sizes["cell"]["w"] + pads["game"]["x"],
-                         y=row * sizes["cell"]["h"] + pads["game"]["y"],
-                         size=(sizes["cell"]["w"], sizes["cell"]["h"]))
+        super().__init__(x=col * sizes["cell"][0] + pads["game"][0],
+                         y=row * sizes["cell"][1] + pads["game"][1],
+                         size=sizes["cell"])
         # Позиция в матрице
         self.row = row
         self.col = col
@@ -23,13 +22,17 @@ class Tile(Sprite):
         if self.on_top:
             self.on_top.update(screen)
 
-    def plant(self, plant, suns):
+    def plant(self, plant, suns, projectiles):
         if self.can_build and self.on_top is None:
             # Подсолнухам нужен доступ к группе солнц
             if plant.__name__ == "Sunflower":
                 self.on_top = plant(self, suns)
-            else:
+            # Орех никак не взаимодействует с зомби и солнцами
+            elif plant.__name__ == "WallNut":
                 self.on_top = plant(self)
+            # Стреляющим растениям нужен доступ к групппе пуль
+            else:
+                self.on_top = plant(self, projectiles)
             return True
         return False
 

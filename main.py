@@ -12,7 +12,7 @@ from config import fps, sizes
 class Game:
     def __init__(self, location):
         pygame.init()
-        pygame.display.set_mode(tuple(sizes["win"].values()))
+        pygame.display.set_mode(sizes["win"])
         pygame.display.set_caption("PvZ α")
 
         self.location = location(self, [PeaShooter, Sunflower])

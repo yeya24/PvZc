@@ -5,12 +5,6 @@ from config import *
 from sprite import Sprite
 
 
-def get_transparent_image(image, alpha=128):
-    im = image.copy()
-    im.fill((255, 255, 255, alpha), None, BLEND_RGBA_MULT)
-    return im
-
-
 class TopMenu:
     def __init__(self, cards):
         # TODO добавить остальные цифры
@@ -23,16 +17,16 @@ class TopMenu:
         }
 
         frame = pygame.image.load("assets/images/topmenu.png").convert_alpha()
-        self.frame = Sprite(100, 0, image=frame, size=tuple(sizes["topmenu"].values()))
+        self.frame = Sprite(100, 0, image=frame, size=sizes["topmenu"])
 
         self.cards = pygame.sprite.Group()
-        x = pads["menubar"]["x"] + pads["sun"]["x"]
+        x = pads["menubar"][0] + pads["sun"][0]
         for card in cards:
             image = pygame.image.load(f"assets/images/card_{card.__name__.lower()}.png").convert()
-            s = Card(x, card, image=image, size=tuple(sizes["card"].values()))
+            s = Card(x, card, image=image, size=sizes["card"])
             self.cards.add(s)
 
-            x += sizes["card"]["w"] + pads["cards"]
+            x += sizes["card"][0] + pads["cards"]
 
     def update(self, screen, sun):
         self.frame.update(screen)
@@ -41,9 +35,9 @@ class TopMenu:
         score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
         digit_widths = list(map(lambda image: image.get_width(), score_digits))
 
-        offset = pads["menubar"]["x"] + (pads["sun"]["x"] - sum(digit_widths)) // 2
+        offset = pads["menubar"][0] + (pads["sun"][0] - sum(digit_widths)) // 2
         for image, width in zip(score_digits, digit_widths):
-            screen.blit(image, (offset, pads["sun"]["y"]))
+            screen.blit(image, (offset, pads["sun"][1]))
             offset += width
 
     def choose_card(self, mouse_pos, previous_choice):
@@ -72,7 +66,7 @@ class Sun(Sprite):
     def __init__(self, x, y, max_y, sunflower=False):
         super().__init__(x, y,
                          image=pygame.image.load("assets/images/sun.png").convert_alpha(),
-                         size=tuple(sizes["sun"].values()))
+                         size=sizes["sun"])
 
         self.despawn_time = fps * 20
         self.max_y = max_y
