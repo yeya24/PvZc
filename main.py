@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 
 from locations import GameLocation  # StartLocation
-from plants import PeaShooter, Sunflower  # delete
+from plants import PeaShooter, Sunflower, WallNut, PotatoMine  # delete
 
 import sys
 
@@ -15,7 +15,7 @@ class Game:
         pygame.display.set_mode(sizes["win"])
         pygame.display.set_caption("PvZ α")
 
-        self.location = location(self, [PeaShooter, Sunflower])
+        self.location = location(self, [PeaShooter, Sunflower, WallNut, PotatoMine])
 
     def event(self, event):
         if event.type == QUIT:
@@ -41,72 +41,6 @@ def main():
         clock.tick(fps)
         game.draw()
 
-
-"""
-PvZ
-├──Game
-|  . 
-├──Location
-|  ├──StartLocation
-|  |
-|  ├──GameLocation
-|  |
-|  ├──LevelPreparationLocation
-|  |
-|  ├──MoveLocation
-|  |
-|  ├──MenuLocation
-|  .
-├──Sprite
-|  ├──Tile
-|  |  ├──Grass
-|  |  .
-|  ├──Plant
-|  |  ├──Peashooter
-|  |  |
-|  |  ├──Sunflower
-|  |  |
-|  |  ├──PotatoMine
-|  |  |
-|  |  ├──WallNut
-|  |  |
-|  |  ├──CherryBomb
-|  |  |
-|  |  ├──Repeater
-|  |  |
-|  |  ├──SnowPea
-|  |  |
-|  |  ├──Chomper
-|  |  .
-|  ├──Projectile
-|  |  ├──PeashooterProjectile
-|  |  |
-|  |  ├──FrozenProjectile
-|  |  .
-|  ├──Zombie
-|  |  ├──NormalZombie
-|  |  |
-|  |  ├──FlagZombie
-|  |  |
-|  |  ├──ConeHeadZombie
-|  |  |
-|  |  ├──PoleVaultingZombie
-|  |  |
-|  |  ├──BucketHeadZombie
-|  |  .
-|  ├──TopMenu
-|  |  .
-|  ├──Cards
-|  |  .
-|  ├──Sun
-|  |  .
-|  ├──
-|  |
-.
-
-
-Game--Location--Tile--Plant--Projectile
-"""
 
 if __name__ == "__main__":
     main()

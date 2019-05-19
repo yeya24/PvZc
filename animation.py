@@ -4,13 +4,13 @@ import pygame
 from pygame.locals import *
 
 
-def get_transparent_image(image, density=255, alpha=128, special_flag=BLEND_RGBA_MULT):
+def transform_image(image, density=255, alpha=128, special_flag=BLEND_RGBA_MULT):
     im = image.copy()
     im.fill((density, density, density, alpha), None, special_flag)
     return im
 
 
-def getImagesFromSpriteSheet(filename, rows, cols, size=None, ratio=None):
+def getImagesFromSpriteSheet(filename, rows, cols, size=None, ratio=None, cycle=True):
     rects = []
 
     sheetImage = pygame.image.load(filename).convert_alpha()
@@ -38,5 +38,7 @@ def getImagesFromSpriteSheet(filename, rows, cols, size=None, ratio=None):
                                                 (int(spriteWidth * ratio),
                                                  int(spriteHeight * ratio)))
         returnedSurfaces.append(surf)
-
-    return itertools.cycle(returnedSurfaces), (spriteWidth, spriteHeight)
+    size = size or (spriteWidth, spriteHeight)
+    if cycle:
+        returnedSurfaces = itertools.cycle(returnedSurfaces)
+    return returnedSurfaces, size

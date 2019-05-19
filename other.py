@@ -22,7 +22,7 @@ class TopMenu:
         self.cards = pygame.sprite.Group()
         x = pads["menubar"][0] + pads["sun"][0]
         for card in cards:
-            image = pygame.image.load(f"assets/images/card_{card.__name__.lower()}.png").convert()
+            image = pygame.image.load(f"assets/images/card{card.__name__}.png").convert()
             s = Card(x, card, image=image, size=sizes["card"])
             self.cards.add(s)
 

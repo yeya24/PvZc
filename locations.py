@@ -3,10 +3,10 @@ from pygame.locals import *
 
 from sprite import Sprite
 from tiles import Grass
-from plants import plant_images
+# from plants import plant_images
 from other import Sun, TopMenu
 from zombies import NormalZombie, ConeHeadZombie, PoleVaultingZombie, BucketHeadZombie, FlagZombie
-from animation import get_transparent_image
+from animation import transform_image
 
 from config import *
 
@@ -60,17 +60,15 @@ class GameLocation(Location):
         # Создание игрового поля из классов клеток
         self.cells = []
         for y in range(YCells):
-            gridRow = []
+            grid_row = []
             for x in range(XCells):
                 tile = Grass(x, y)
-                gridRow.append(tile)
-            self.cells.append(gridRow)
+                grid_row.append(tile)
+            self.cells.append(grid_row)
 
         # Вызов падающего солнца каждые sun_drop_delay секунд
         pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
 
-        self.zombies.add(BucketHeadZombie(2))
-        self.zombies.add(ConeHeadZombie(1))
         self.zombies.add(NormalZombie(0))
 
     def update(self):
@@ -84,10 +82,10 @@ class GameLocation(Location):
             for cell in reversed(row):
                 cell.update(self.screen)
                 # Изображение тени растения на клетку
-                if cell.on_top is None and self.plant_choice is not None \
+                if cell.isempty() and self.plant_choice is not None \
                         and cell.rect.collidepoint((x, y)):
                     # Располагается в середине
-                    self.screen.blit(get_transparent_image(self.plant_choice_image),
+                    self.screen.blit(transform_image(self.plant_choice_image),
                                      (cell.rect.x + (sizes["cell"][0] -
                                                      self.plant_choice_image.get_width()) / 2,
                                       cell.rect.y + (sizes["cell"][1] -
@@ -100,10 +98,10 @@ class GameLocation(Location):
                               y - self.plant_choice_image.get_height()))
         # Сначала отрисовываются верхние правые
         for zombie in sorted(self.zombies.sprites(),
-                             key=lambda zombie: zombie.row * XCells + zombie.cell):
+                             key=lambda zombie: zombie.row * XCells + zombie.col):
             zombie.update(self.screen)
 
-        self.projectile_collision_check()
+        self.game_event_check()
         self.projectiles.update(self.screen)
         self.suns_group.update(self.screen)
 
@@ -130,24 +128,22 @@ class GameLocation(Location):
                 self.plant_choice = self.menubar.choose_card((x, y), self.plant_choice)
                 self.plant_choice_image = None
                 if self.plant_choice is not None:
-                    self.plant_choice_image = plant_images[self.plant_choice.__name__]
+                    self.plant_choice_image = self.plant_choice.shadow
             else:
                 # Быстрый способ выбрать клетку
                 # Если текущее количество солнц меньше стоимости выбранного растения
-                if self.plant_choice is None or self.suns < self.plant_choice.chars["sunCost"]:
+                if self.plant_choice is None or self.suns < self.plant_choice.sunCost:
                     return
 
                 x -= pads["game"][0]
                 y -= pads["game"][1]
                 if x < 0 or y < 0:
                     return
-
                 try:
                     cell = self.cells[y // sizes["cell"][1]][x // sizes["cell"][0]]
                     if cell.plant(self.plant_choice, self.suns_group, self.projectiles):
-                        self.suns -= self.plant_choice.chars["sunCost"]
+                        self.suns -= self.plant_choice.sunCost
                         self.plant_choice = self.plant_choice_image = None
-
                 except IndexError:
                     return
 
@@ -156,13 +152,23 @@ class GameLocation(Location):
         x = random.randint(sizes["win"][0] // 10, sizes["win"][0] * 9 // 10)
         self.suns_group.add(Sun(x, sizes["topmenu"][1], max_y))
 
-    def projectile_collision_check(self):
-        for projectile in self.projectiles.sprites():
-            for zombie in self.zombies.sprites():
+    def game_event_check(self):
+        # Проверка пуль на столкновение
+        for projectile in self.projectiles:
+            for zombie in self.zombies:
                 if projectile.row == zombie.row and projectile.rect.x >= zombie.rect.x:
                     zombie.take_damage(projectile)
                     # Играть звук попадания
                     break
+
+        # Проврека пересечений между зомби и растениями
+        # Если находятся в одной клетке, заставить зомби есть растение
+        for zombie in filter(lambda zombie: not zombie.busy(), self.zombies):
+            for cell in filter(lambda cell: not cell.isempty() and cell.col == zombie.col,
+                                self.cells[zombie.row]):
+                zombie.change_target(cell.planted)
+                break
+        # TODO проигрыш
 
 
 class LevelPreparationLocation(Location):
