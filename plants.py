@@ -1,10 +1,9 @@
 import pygame
 
-from config import *
-
-from sprite import Sprite
-from other import Sun
 from animation import getImagesFromSpriteSheet
+from config import *
+from other import Sun
+from sprite import Sprite
 
 
 class Plant(Sprite):
@@ -109,12 +108,13 @@ class Sunflower(Plant):
 
 
 class PotatoMine(Plant):
-    shadow = pygame.image.load("assets/images/potatomine_.png")
+    shadow = pygame.image.load("assets/images/potatoMine_.png")
+
     sunCost = 25
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 4
+    reload = fps * 24
 
     def __init__(self, cell):
         # TODO добавить взрыв при контакте с врагом
@@ -122,28 +122,44 @@ class PotatoMine(Plant):
                                                   7, 4)
         self.arming, size = getImagesFromSpriteSheet("assets/images/potatoMineArming.png",
                                                      1, 3, size=sizes["plant"], cycle=False)
+        self.explosion = pygame.transform.smoothscale(
+            pygame.image.load("assets/images/potatoMineExplosion.png").convert_alpha(),
+            sizes["potatoExp"])
         super().__init__(cell,
                          anim_speed=fps / 12,
                          image=self.arming[0],
                          size=size)
         self.armed = False
+        self.detonation = 30
 
     def update(self, screen):
-        self.counter += 1
-        if not self.armed:
-            if self.counter == self.reload:
-                self.image = next(self.images)
-                self.counter = 0
-                self.armed = True
-            elif self.counter > self.reload * 2 / 3:
-                self.image = self.arming[2]
-            elif self.counter > self.reload / 3:
-                self.image = self.arming[1]
+        if self.health > 0:
+            self.counter += 1
+            if not self.armed:
+                if self.counter == self.reload:
+                    self.image = next(self.images)
+                    self.counter = 0
+                    self.armed = True
+                elif self.counter > self.reload * 2 / 3:
+                    self.image = self.arming[2]
+                elif self.counter > self.reload / 3:
+                    self.image = self.arming[1]
+            else:
+                if self.counter == self.animation_frame:
+                    self.image = next(self.images)
+                    self.counter = 0
         else:
-            if self.counter == self.animation_frame:
-                self.image = next(self.images)
-                self.counter = 0
+            self.detonation -= 1
+            if not self.detonation:
+                self.kill()
         self._draw(screen)
+
+    def explode(self, enemy):
+        self.image = self.explosion
+        self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) / 2
+        enemy.health -= self.damage
+        enemy.check_alive()
+        self.health = 0  # Для начала отображения изображения взрыва
 
 
 class WallNut(Plant):
@@ -186,16 +202,18 @@ class Repeater(Plant):
 
 
 class SnowPea(Plant):
+    shadow = pygame.image.load("assets/images/snowPea_.png")
+
     sunCost = 175
     health = 300
     recharge = 5
-    reload = 20
-    damage = fps * 1.5
+    reload = 1.5 * fps
+    damage = 20
 
     def __init__(self, cell, projectiles):
         images, size = getImagesFromSpriteSheet("assets/images/snowPea.png",
                                                 7, 3, size=sizes["plant"])
-        super().__init__(cell, anim_speed=fps // 30,
+        super().__init__(cell, anim_speed=fps // 20,
                          images=images, size=size)
         self.projectiles = projectiles
 
@@ -223,8 +241,6 @@ class Chomper(Plant):
 
 
 class Projectile(Sprite):
-    """Базовый класс для пуль"""
-
     def __init__(self, x, y, row, speed, damage, image, size=None):
         super().__init__(x, y, image, size)
         self.speed = speed
@@ -251,8 +267,9 @@ class PeashooterProjectile(Projectile):
 
 
 class SnowProjectile(Projectile):
+    freeze_time = fps * 1.5
+
     def __init__(self, x, y, row):
-        # TODO добавить заморозку врага
         super().__init__(x + 5, y + 5, row,
                          6, 20,
                          pygame.image.load("assets/images/snowPeaProjectile.png").

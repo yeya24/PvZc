@@ -1,0 +1,5 @@
+
+.idea/vagrant.xml
+.idea/workspace.xml
+__pycache__/animation.cpython-37.pyc
+*.pyc

@@ -1,16 +1,14 @@
+import random
+
 import pygame
 from pygame.locals import *
 
+from animation import transform_image
+from config import *
+from other import Sun, TopMenu
 from sprite import Sprite
 from tiles import Grass
-# from plants import plant_images
-from other import Sun, TopMenu
-from zombies import NormalZombie, ConeHeadZombie, PoleVaultingZombie, BucketHeadZombie, FlagZombie
-from animation import transform_image
-
-from config import *
-
-import random
+from zombies import NormalZombie
 
 
 class Location:
@@ -45,7 +43,7 @@ class GameLocation(Location):
         super().__init__(parent)
         # Инициализация игрового интерфейса
         self.plant_choice = self.plant_choice_image = None
-        self.suns = 100
+        self.suns = 300  # starting_sun
         # Группы спрайтов солнц и зомби, т. к. порядок их отображения не важен
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
@@ -128,7 +126,7 @@ class GameLocation(Location):
                 self.plant_choice = self.menubar.choose_card((x, y), self.plant_choice)
                 self.plant_choice_image = None
                 if self.plant_choice is not None:
-                    self.plant_choice_image = self.plant_choice.shadow
+                    self.plant_choice_image = self.plant_choice.shadow.convert_alpha()
             else:
                 # Быстрый способ выбрать клетку
                 # Если текущее количество солнц меньше стоимости выбранного растения
@@ -153,6 +151,7 @@ class GameLocation(Location):
         self.suns_group.add(Sun(x, sizes["topmenu"][1], max_y))
 
     def game_event_check(self):
+        # TODO оптимизировать все проверки
         # Проверка пуль на столкновение
         for projectile in self.projectiles:
             for zombie in self.zombies:
@@ -165,9 +164,19 @@ class GameLocation(Location):
         # Если находятся в одной клетке, заставить зомби есть растение
         for zombie in filter(lambda zombie: not zombie.busy(), self.zombies):
             for cell in filter(lambda cell: not cell.isempty() and cell.col == zombie.col,
-                                self.cells[zombie.row]):
-                zombie.change_target(cell.planted)
-                break
+                               self.cells[zombie.row]):
+                plant = cell.planted
+                zombie.change_target(plant)
+                # Взрыв картофельной мины
+
+        for zombie in self.zombies:
+            for cell in filter(lambda cell: not cell.isempty() and cell.col == zombie.col,
+                               self.cells[zombie.row]):
+                plant = cell.planted.sprite
+                if plant.__class__.__name__ == "PotatoMine":
+                    if plant.armed:
+                        plant.explode(zombie)
+
         # TODO проигрыш
 
 

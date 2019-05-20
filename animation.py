@@ -4,9 +4,10 @@ import pygame
 from pygame.locals import *
 
 
-def transform_image(image, density=255, alpha=128, special_flag=BLEND_RGBA_MULT):
-    im = image.copy()
-    im.fill((density, density, density, alpha), None, special_flag)
+def transform_image(image, r=255, g=255, b=255, alpha=128, special_flag=BLEND_RGBA_MULT):
+
+    im = image.copy().convert_alpha()
+    im.fill((r, g, b, alpha), None, special_flag)
     return im
 
 

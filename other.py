@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 
 from config import *
 from sprite import Sprite
@@ -32,13 +31,13 @@ class TopMenu:
         self.frame.update(screen)
         self.cards.update(screen)
 
-        score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
-        digit_widths = list(map(lambda image: image.get_width(), score_digits))
-
-        offset = pads["menubar"][0] + (pads["sun"][0] - sum(digit_widths)) // 2
-        for image, width in zip(score_digits, digit_widths):
-            screen.blit(image, (offset, pads["sun"][1]))
-            offset += width
+        # score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
+        # digit_widths = list(map(lambda image: image.get_width(), score_digits))
+        #
+        # offset = pads["menubar"][0] + (pads["sun"][0] - sum(digit_widths)) // 2
+        # for image, width in zip(score_digits, digit_widths):
+        #     screen.blit(image, (offset, pads["sun"][1]))
+        #     offset += width
 
     def choose_card(self, mouse_pos, previous_choice):
         for card in self.cards:

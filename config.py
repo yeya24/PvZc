@@ -18,7 +18,8 @@ sizes = {
     "sun":        (60, 60),
     "projectile": (20, 20),
     "zombie":     (72, 124),
-    "plant":      (62, 62)
+    "plant":      (62, 62),
+    "potatoExp": (88, 62)
 
 }
 
