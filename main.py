@@ -11,6 +11,7 @@ from plants import PeaShooter, PotatoMine, SnowPea, Sunflower, WallNut  # delete
 class Game:
     def __init__(self, location):
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_mode(sizes["win"])
         pygame.display.set_caption("PvZ α")
 

@@ -54,8 +54,11 @@ class Card(Sprite):
     def __init__(self, x, plant, image, size=None):
         super().__init__(x, 8, image, size)
         self.plant = plant
+        # Звук выбора растения
+        self.sound = pygame.mixer.Sound("assets/audio/seedlift.wav")
 
     def choose(self):
+        self.sound.play()
         return self.plant
 
 
@@ -70,6 +73,7 @@ class Sun(Sprite):
         self.despawn_time = fps * 20
         self.max_y = max_y
         self.speedx = self.up_go = 0
+        self.pickup_sound = pygame.mixer.Sound("assets/audio/points.wav")
         if sunflower:
             self.up_go = (max_y - y) // self.speedy  # Поднимается до верхней границы клетки
 
@@ -89,6 +93,13 @@ class Sun(Sprite):
                 self.kill()
 
         self._draw(screen)
+
+    def check_collision(self, coords):
+        if self.rect.collidepoint(coords):
+            self.kill()
+            self.pickup_sound.play()
+            return True
+        return False
 
 
 class LawnMover(Sprite):

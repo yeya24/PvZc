@@ -114,7 +114,7 @@ class PotatoMine(Plant):
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 24
+    reload = fps * 2
 
     def __init__(self, cell):
         # TODO добавить взрыв при контакте с врагом
@@ -156,7 +156,9 @@ class PotatoMine(Plant):
 
     def explode(self, enemy):
         self.image = self.explosion
+        # Конфигурация положения изображения (т. к. размеры взрыва и обычные различаются)
         self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) / 2
+        self.rect.y -= (sizes["potatoExp"][1] - sizes["cell"][1]) / 1.2
         enemy.health -= self.damage
         enemy.check_alive()
         self.health = 0  # Для начала отображения изображения взрыва

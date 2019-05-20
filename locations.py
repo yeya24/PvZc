@@ -8,7 +8,7 @@ from config import *
 from other import Sun, TopMenu
 from sprite import Sprite
 from tiles import Grass
-from zombies import NormalZombie
+from zombies import ConeHeadZombie
 
 
 class Location:
@@ -52,7 +52,6 @@ class GameLocation(Location):
         self.background = Sprite(0, 0,
                                  image=pygame.image.load("assets/images/sm_bg.png").convert_alpha(),
                                  size=sizes["win"])
-
         # Загрузка меню с индикацией солнышек и выбором цветов
         self.menubar = TopMenu(cards)
         # Создание игрового поля из классов клеток
@@ -66,8 +65,11 @@ class GameLocation(Location):
 
         # Вызов падающего солнца каждые sun_drop_delay секунд
         pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
-
-        self.zombies.add(NormalZombie(0))
+        # Музыка
+        pygame.mixer_music.load("assets/audio/pvzBG1.wav")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer_music.play(loops=-1)
+        self.zombies.add(ConeHeadZombie(0))
 
     def update(self):
         self.background.update(self.screen)
@@ -82,7 +84,7 @@ class GameLocation(Location):
                 # Изображение тени растения на клетку
                 if cell.isempty() and self.plant_choice is not None \
                         and cell.rect.collidepoint((x, y)):
-                    # Располагается в середине
+                    # Располагается в середине клетки
                     self.screen.blit(transform_image(self.plant_choice_image),
                                      (cell.rect.x + (sizes["cell"][0] -
                                                      self.plant_choice_image.get_width()) / 2,
@@ -116,9 +118,8 @@ class GameLocation(Location):
 
             # Проверка всех солнц на пересечение с местом клика
             for sun in self.suns_group:
-                if sun.rect.collidepoint((x, y)):
+                if sun.check_collision((x, y)):
                     self.suns += 25
-                    sun.kill()
                     return
 
             # Выбор цветка / лопаты

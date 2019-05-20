@@ -19,7 +19,7 @@ sizes = {
     "projectile": (20, 20),
     "zombie":     (72, 124),
     "plant":      (62, 62),
-    "potatoExp": (88, 62)
+    "potatoExp": (300, 200)
 
 }
 
