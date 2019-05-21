@@ -5,7 +5,7 @@ from pygame.locals import *
 
 from config import fps, sizes
 from locations import GameLocation  # StartLocation
-from plants import PeaShooter, PotatoMine, SnowPea, Sunflower, WallNut  # delete
+from plants import PeaShooter, PotatoMine, SnowPea, Sunflower, WallNut, Repeater  # delete
 
 
 class Game:
@@ -15,7 +15,7 @@ class Game:
         pygame.display.set_mode(sizes["win"])
         pygame.display.set_caption("PvZ α")
 
-        self.location = location(self, [PeaShooter, Sunflower, WallNut, PotatoMine, SnowPea])
+        self.location = location(self, [PeaShooter, Sunflower, WallNut, PotatoMine, SnowPea, Repeater])
 
     def event(self, event):
         if event.type == QUIT:

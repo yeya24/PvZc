@@ -1,7 +1,6 @@
 import pygame
 
-from config import *
-
+from config import sizes, pads
 from sprite import Sprite
 
 

@@ -1,8 +1,9 @@
 import pygame
 
 from animation import getImagesFromSpriteSheet
-from config import *
-from other import Sun
+from config import fps, sizes
+from other import Sun, lcm
+from projectiles import PeashooterProjectile, SnowProjectile
 from sprite import Sprite
 
 
@@ -31,7 +32,9 @@ class Plant(Sprite):
         # Частота обновления анимации
         self.animation_frame = anim_speed
         # Прочие характеристики
-        self.coords = (cell.row, cell.col)
+        self.coords = cell.coords
+        # Звук поедания зомби
+        self.death_sound = pygame.mixer.Sound("assets/audio/gulp.wav")
 
     def update(self, screen):
         if self.animation_frame is not None:
@@ -41,6 +44,11 @@ class Plant(Sprite):
 
             self.counter %= self.animation_frame
         self._draw(screen)
+
+    def check_alive(self):
+        if self.health <= 0:
+            self.kill()
+            self.death_sound.play()
 
 
 class PeaShooter(Plant):
@@ -59,6 +67,8 @@ class PeaShooter(Plant):
                          images=images, size=size)
         self.projectiles = projectiles
 
+        self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
+
     def update(self, screen):
         self.counter += 1
         if self.counter % self.animation_frame == 0:
@@ -66,13 +76,14 @@ class PeaShooter(Plant):
         if self.counter % self.reload == 0:
             self.shot()
 
-        self.counter %= self.reload * self.animation_frame
+        self.counter %= lcm(self.reload * self.animation_frame)
         self._draw(screen)
 
     def shot(self):
         # Создание зеленой пули
         b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
+        self.shot_sound.play()
 
 
 class Sunflower(Plant):
@@ -91,6 +102,8 @@ class Sunflower(Plant):
         self.suns_group = suns_group
         self.counter = fps * 17
 
+        self.sun_sound = pygame.mixer.Sound("assets/audio/throw.wav")
+
     def update(self, screen):
         self.counter += 1
         if self.counter % self.animation_frame == 0:
@@ -98,13 +111,14 @@ class Sunflower(Plant):
         if self.counter % self.reload == 0:
             self.generate_sun()
 
-        self.counter %= self.reload * self.animation_frame
+        self.counter %= lcm(self.reload, self.animation_frame)
         self._draw(screen)
 
     def generate_sun(self):
         self.suns_group.add(
             Sun(self.rect.x, self.rect.top, self.rect.centery, True)
         )
+        self.sun_sound.play()
 
 
 class PotatoMine(Plant):
@@ -114,10 +128,9 @@ class PotatoMine(Plant):
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 2
+    reload = fps * 14
 
     def __init__(self, cell):
-        # TODO добавить взрыв при контакте с врагом
         self.images, _ = getImagesFromSpriteSheet("assets/images/potatoMineReady.png",
                                                   7, 4)
         self.arming, size = getImagesFromSpriteSheet("assets/images/potatoMineArming.png",
@@ -126,11 +139,12 @@ class PotatoMine(Plant):
             pygame.image.load("assets/images/potatoMineExplosion.png").convert_alpha(),
             sizes["potatoExp"])
         super().__init__(cell,
-                         anim_speed=fps / 12,
+                         anim_speed=fps // 12,
                          image=self.arming[0],
                          size=size)
         self.armed = False
-        self.detonation = 30
+        self.detonation = 60
+        self.detonation_sound = pygame.mixer.Sound("assets/audio/potato_mine.wav")
 
     def update(self, screen):
         if self.health > 0:
@@ -138,16 +152,14 @@ class PotatoMine(Plant):
             if not self.armed:
                 if self.counter == self.reload:
                     self.image = next(self.images)
-                    self.counter = 0
-                    self.armed = True
-                elif self.counter > self.reload * 2 / 3:
+                    self.counter, self.armed = 0, True
+                elif self.counter > self.reload * 2 // 3:
                     self.image = self.arming[2]
-                elif self.counter > self.reload / 3:
+                elif self.counter > self.reload // 3:
                     self.image = self.arming[1]
-            else:
-                if self.counter == self.animation_frame:
-                    self.image = next(self.images)
-                    self.counter = 0
+            elif self.counter == self.animation_frame:
+                self.image = next(self.images)
+                self.counter = 0
         else:
             self.detonation -= 1
             if not self.detonation:
@@ -157,11 +169,12 @@ class PotatoMine(Plant):
     def explode(self, enemy):
         self.image = self.explosion
         # Конфигурация положения изображения (т. к. размеры взрыва и обычные различаются)
-        self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) / 2
-        self.rect.y -= (sizes["potatoExp"][1] - sizes["cell"][1]) / 1.2
+        self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) // 2
+        self.rect.y -= (sizes["potatoExp"][1] - sizes["cell"][1]) // 1.2
         enemy.health -= self.damage
         enemy.check_alive()
         self.health = 0  # Для начала отображения изображения взрыва
+        self.detonation_sound.play()
 
 
 class WallNut(Plant):
@@ -189,6 +202,8 @@ class WallNut(Plant):
 
 
 class CherryBomb(Plant):
+    shadow = None
+
     sunCost = 150
     health = 200
     recharge = 35
@@ -196,11 +211,38 @@ class CherryBomb(Plant):
 
 
 class Repeater(Plant):
+    shadow = pygame.image.load("assets/images/repeater_.png")
+
     sunCost = 200
     health = 300
     recharge = 5
     reload = fps * 1.5
     damage = 20
+
+    def __init__(self, cell, projectiles):
+        images, size = getImagesFromSpriteSheet("assets/images/repeater.png",
+                                                14, 3, size=sizes["plant"])
+        super().__init__(cell, anim_speed=fps // 20,
+                         images=images, size=size)
+        self.projectiles = projectiles
+        self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
+
+    def update(self, screen):
+        self.counter += 1
+        if self.counter % self.animation_frame == 0:
+            self.image = next(self.images)
+        if self.counter % self.reload == 0:
+            self.shot()
+        elif (self.counter - 10) % self.reload == 0:
+            self.shot()
+
+        self.counter %= lcm(self.reload, self.reload + 10, self.animation_frame)
+        self._draw(screen)
+
+    def shot(self):
+        b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
+        self.projectiles.add(b)
+        self.shot_sound.play()
 
 
 class SnowPea(Plant):
@@ -218,6 +260,7 @@ class SnowPea(Plant):
         super().__init__(cell, anim_speed=fps // 20,
                          images=images, size=size)
         self.projectiles = projectiles
+        self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
 
     def update(self, screen):
         self.counter += 1
@@ -226,12 +269,13 @@ class SnowPea(Plant):
         if self.counter % self.reload == 0:
             self.shot()
 
-        self.counter %= self.reload * self.animation_frame
+        self.counter %= lcm(self.reload, self.animation_frame)
         self._draw(screen)
 
     def shot(self):
         b = SnowProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
+        self.shot_sound.play()
 
 
 class Chomper(Plant):
@@ -239,41 +283,4 @@ class Chomper(Plant):
     health = 300
     recharge = 5
     reload = fps * 42
-    damage = 9999
-
-
-class Projectile(Sprite):
-    def __init__(self, x, y, row, speed, damage, image, size=None):
-        super().__init__(x, y, image, size)
-        self.speed = speed
-        self.damage = damage
-        self.row = row
-
-    def deal_damage(self, target):
-        target.health -= self.damage
-
-    def update(self, screen):
-        self.rect.x += self.speed
-        self._draw(screen)
-        if self.rect.x >= sizes["win"][0]:
-            self.kill()
-
-
-class PeashooterProjectile(Projectile):
-    def __init__(self, x, y, row):
-        super().__init__(x + 5, y + 5, row,
-                         6, 20,
-                         pygame.image.load("assets/images/peaShooterProjectile.png").
-                         convert_alpha(),
-                         size=sizes["projectile"])
-
-
-class SnowProjectile(Projectile):
-    freeze_time = fps * 1.5
-
-    def __init__(self, x, y, row):
-        super().__init__(x + 5, y + 5, row,
-                         6, 20,
-                         pygame.image.load("assets/images/snowPeaProjectile.png").
-                         convert_alpha(),
-                         size=sizes["projectile"])
+    damage = -1

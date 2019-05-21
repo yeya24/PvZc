@@ -3,6 +3,11 @@ import pygame
 from config import *
 from sprite import Sprite
 
+def lcm(*args):
+    import math
+    from functools import reduce
+    return reduce(lambda a, b: a * b // math.gcd(a, b), map(int, args))
+
 
 class TopMenu:
     def __init__(self, cards):

@@ -19,7 +19,7 @@ sizes = {
     "projectile": (20, 20),
     "zombie":     (72, 124),
     "plant":      (62, 62),
-    "potatoExp": (300, 200)
+    "potatoExp":  (300, 200)
 
 }
 
@@ -27,5 +27,5 @@ pads = {
     "game":    (213, 170),
     "sun":     (85, 70),
     "menubar": (100, 0),
-    "cards":   10
+    "cards":   8
 }

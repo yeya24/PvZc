@@ -3,16 +3,15 @@ import random
 import pygame
 from pygame.locals import *
 
+from sprite import Sprite
 from animation import transform_image
 from config import *
 from other import Sun, TopMenu
-from sprite import Sprite
 from tiles import Grass
 from zombies import ConeHeadZombie
 
 
 class Location:
-    """Базовый класс для игровых локаций"""
     parent = None
 
     def __init__(self, parent):
@@ -43,7 +42,7 @@ class GameLocation(Location):
         super().__init__(parent)
         # Инициализация игрового интерфейса
         self.plant_choice = self.plant_choice_image = None
-        self.suns = 300  # starting_sun
+        self.suns = 2500  # starting_sun
         # Группы спрайтов солнц и зомби, т. к. порядок их отображения не важен
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
@@ -66,9 +65,10 @@ class GameLocation(Location):
         # Вызов падающего солнца каждые sun_drop_delay секунд
         pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
         # Музыка
-        pygame.mixer_music.load("assets/audio/pvzBG1.wav")
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer_music.load("assets/audio/grasswalk.mp3")
+        pygame.mixer.music.set_volume(0.75)
         pygame.mixer_music.play(loops=-1)
+
         self.zombies.add(ConeHeadZombie(0))
 
     def update(self):
@@ -101,7 +101,7 @@ class GameLocation(Location):
                              key=lambda zombie: zombie.row * XCells + zombie.col):
             zombie.update(self.screen)
 
-        self.game_event_check()
+        self.game_event()
         self.projectiles.update(self.screen)
         self.suns_group.update(self.screen)
 
@@ -151,7 +151,7 @@ class GameLocation(Location):
         x = random.randint(sizes["win"][0] // 10, sizes["win"][0] * 9 // 10)
         self.suns_group.add(Sun(x, sizes["topmenu"][1], max_y))
 
-    def game_event_check(self):
+    def game_event(self):
         # TODO оптимизировать все проверки
         # Проверка пуль на столкновение
         for projectile in self.projectiles:
@@ -168,8 +168,8 @@ class GameLocation(Location):
                                self.cells[zombie.row]):
                 plant = cell.planted
                 zombie.change_target(plant)
-                # Взрыв картофельной мины
 
+        # Взрыв картофельной мины
         for zombie in self.zombies:
             for cell in filter(lambda cell: not cell.isempty() and cell.col == zombie.col,
                                self.cells[zombie.row]):
