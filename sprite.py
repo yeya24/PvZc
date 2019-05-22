@@ -3,7 +3,9 @@ import pygame
 
 class Sprite(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, image=None, size=None, path=None):
+    def __init__(self, x: int, y: int,
+                 image: "pygame.Surface" = None,
+                 size: tuple = None, path: str = None):
         super().__init__()
         if image is not None:
             if size is not None:

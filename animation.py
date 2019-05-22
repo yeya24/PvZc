@@ -4,13 +4,18 @@ import pygame
 from pygame.locals import *
 
 
-def transform_image(image, r=255, g=255, b=255, alpha=128, special_flag=BLEND_RGBA_MULT):
+def transform_image(image: pygame.Surface,
+                    r: int = 255, g: int = 255, b: int = 255,
+                    alpha: int = 128, special_flag: int = BLEND_RGBA_MULT) -> pygame.Surface:
     im = image.copy().convert_alpha()
     im.fill((r, g, b, alpha), None, special_flag)
     return im
 
 
-def getImagesFromSpriteSheet(filename, rows, cols, size=None, ratio=None, cycle=True):
+def get_images_from_sprite_sheet(filename: str,
+                                 rows: int, cols: int,
+                                 size: tuple = None, ratio: float = None,
+                                 cycle: bool = True):
     rects = []
 
     sheetImage = pygame.image.load(filename).convert_alpha()

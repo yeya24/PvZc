@@ -8,7 +8,7 @@ from animation import transform_image
 from config import *
 from other import Sun, TopMenu
 from tiles import Grass
-from zombies import ConeHeadZombie
+from zombies import NormalZombie
 
 
 class Location:
@@ -69,7 +69,7 @@ class GameLocation(Location):
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer_music.play(loops=-1)
 
-        self.zombies.add(ConeHeadZombie(0))
+        self.zombies.add(NormalZombie(0))
 
     def update(self):
         self.background.update(self.screen)

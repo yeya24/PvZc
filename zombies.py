@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-from animation import getImagesFromSpriteSheet, transform_image
+from animation import get_images_from_sprite_sheet, transform_image
 from config import sizes, pads, fps, XCells
 from sprite import Sprite
 from other import lcm
@@ -103,11 +103,11 @@ class Zombie(Sprite):
         self.col = (self.rect.x - pads["game"][0] + sizes["cell"][0] / 2) // sizes["cell"][0]
         self._draw(screen)
 
-    def busy(self):
+    def busy(self) -> bool:
         # Проверка, есть ли зомби
-        return len(self.eating)
+        return bool(len(self.eating))
 
-    def coords(self):
+    def coords(self) -> tuple:
         # Координаты на игровом поле
         return self.row, self.col
 
@@ -140,18 +140,17 @@ class Zombie(Sprite):
 
 class NormalZombie(Zombie):
 
-    def __init__(self, row):
-        images, size = getImagesFromSpriteSheet("assets/images/normalZombie.png",
-                                                10, 5, ratio=4 / 5)
-
+    def __init__(self, row: int):
+        images, size = get_images_from_sprite_sheet("assets/images/normalZombie.png",
+                                                    10, 5, ratio=4 / 5)
         super().__init__(row, images, size)
 
 
 class FlagZombie(Zombie):
 
-    def __init__(self, row):
-        images, size = getImagesFromSpriteSheet("assets/images/flagZombie.png",
-                                                10, 5, ratio=4 / 5)
+    def __init__(self, row: int):
+        images, size = get_images_from_sprite_sheet("assets/images/flagZombie.png",
+                                                    10, 5, ratio=4 / 5)
 
         super().__init__(row, images, size)
 
@@ -159,9 +158,9 @@ class FlagZombie(Zombie):
 class ConeHeadZombie(Zombie):
     health = 560
 
-    def __init__(self, row):
-        images, size = getImagesFromSpriteSheet("assets/images/coneHeadZombie.png",
-                                                10, 5, ratio=4 / 5)
+    def __init__(self, row: int):
+        images, size = get_images_from_sprite_sheet("assets/images/coneHeadZombie.png",
+                                                    10, 5, ratio=4 / 5)
         super().__init__(row, images, size)
 
 
@@ -172,7 +171,7 @@ class PoleVaultingZombie(Zombie):
 class BucketHeadZombie(Zombie):
     health = 1300
 
-    def __init__(self, row):
-        images, size = getImagesFromSpriteSheet("assets/images/bucketHeadZombie.png",
-                                                10, 5, ratio=4 / 5)
+    def __init__(self, row: int):
+        images, size = get_images_from_sprite_sheet("assets/images/bucketHeadZombie.png",
+                                                    10, 5, ratio=4 / 5)
         super().__init__(row, images, size)

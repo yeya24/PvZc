@@ -1,6 +1,6 @@
 import pygame
 
-from animation import getImagesFromSpriteSheet
+from animation import get_images_from_sprite_sheet
 from config import fps, sizes
 from other import Sun, lcm
 from projectiles import PeashooterProjectile, SnowProjectile
@@ -19,7 +19,9 @@ class Plant(Sprite):
     reload = 0
     damage = 0
 
-    def __init__(self, cell, anim_speed=None, images=None, image=None, size=None):
+    def __init__(self, cell, anim_speed: int = None,
+                 images: list = None, image: pygame.Surface = None,
+                 size: tuple = None):
         if images is None and image is None:
             image = pygame.Surface(size)
         elif images is not None:
@@ -60,9 +62,9 @@ class PeaShooter(Plant):
     damage = 20
     reload = fps * 1.5
 
-    def __init__(self, cell, projectiles):
-        images, size = getImagesFromSpriteSheet("assets/images/peaShooter.png",
-                                                13, 3, size=sizes["plant"])
+    def __init__(self, cell, projectiles: pygame.sprite.Group):
+        images, size = get_images_from_sprite_sheet("assets/images/peaShooter.png",
+                                                    13, 3, size=sizes["plant"])
         super().__init__(cell, anim_speed=fps // 30,
                          images=images, size=size)
         self.projectiles = projectiles
@@ -95,8 +97,8 @@ class Sunflower(Plant):
     reload = fps * 24
 
     def __init__(self, cell, suns_group):
-        images, size = getImagesFromSpriteSheet("assets/images/sunflower.png",
-                                                18, 3, size=sizes["plant"])
+        images, size = get_images_from_sprite_sheet("assets/images/sunflower.png",
+                                                    18, 3, size=sizes["plant"])
         super().__init__(cell, anim_speed=fps // 20,
                          images=images, size=size)
         self.suns_group = suns_group
@@ -128,13 +130,13 @@ class PotatoMine(Plant):
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 14
+    reload = fps * 4
 
     def __init__(self, cell):
-        self.images, _ = getImagesFromSpriteSheet("assets/images/potatoMineReady.png",
-                                                  7, 4)
-        self.arming, size = getImagesFromSpriteSheet("assets/images/potatoMineArming.png",
-                                                     1, 3, size=sizes["plant"], cycle=False)
+        self.images, _ = get_images_from_sprite_sheet("assets/images/potatoMineReady.png",
+                                                      7, 4)
+        self.arming, size = get_images_from_sprite_sheet("assets/images/potatoMineArming.png",
+                                                         1, 3, size=sizes["plant"], cycle=False)
         self.explosion = pygame.transform.smoothscale(
             pygame.image.load("assets/images/potatoMineExplosion.png").convert_alpha(),
             sizes["potatoExp"])
@@ -185,8 +187,8 @@ class WallNut(Plant):
     recharge = 20
 
     def __init__(self, cell):
-        self.images, size = getImagesFromSpriteSheet("assets/images/wallNut.png",
-                                                     1, 3, size=sizes["plant"], cycle=False)
+        self.images, size = get_images_from_sprite_sheet("assets/images/wallNut.png",
+                                                         1, 3, size=sizes["plant"], cycle=False)
         super().__init__(cell, image=self.images[0],
                          size=size)
         self.max_health = self.health
@@ -220,8 +222,8 @@ class Repeater(Plant):
     damage = 20
 
     def __init__(self, cell, projectiles):
-        images, size = getImagesFromSpriteSheet("assets/images/repeater.png",
-                                                14, 3, size=sizes["plant"])
+        images, size = get_images_from_sprite_sheet("assets/images/repeater.png",
+                                                    14, 3, size=sizes["plant"])
         super().__init__(cell, anim_speed=fps // 20,
                          images=images, size=size)
         self.projectiles = projectiles
@@ -255,8 +257,8 @@ class SnowPea(Plant):
     damage = 20
 
     def __init__(self, cell, projectiles):
-        images, size = getImagesFromSpriteSheet("assets/images/snowPea.png",
-                                                7, 3, size=sizes["plant"])
+        images, size = get_images_from_sprite_sheet("assets/images/snowPea.png",
+                                                    7, 3, size=sizes["plant"])
         super().__init__(cell, anim_speed=fps // 20,
                          images=images, size=size)
         self.projectiles = projectiles
@@ -279,8 +281,19 @@ class SnowPea(Plant):
 
 
 class Chomper(Plant):
+    shadow = None
+
     sunCost = 150
     health = 300
     recharge = 5
     reload = fps * 42
     damage = -1
+
+
+class Squash(Plant):
+    shadow = None
+
+    sunCost = 50
+    recharge = 20
+    damage = 1800
+

@@ -7,7 +7,9 @@ from config import sizes, fps
 
 
 class Projectile(Sprite):
-    def __init__(self, x, y, row, speed, damage, image, size=None):
+    def __init__(self, x: int, y: int, row: int,
+                 speed: float, damage: int,
+                 image: pygame.Surface, size: tuple = None):
         super().__init__(x, y, image, size)
         self.speed = speed
         self.damage = damage

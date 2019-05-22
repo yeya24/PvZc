@@ -3,14 +3,15 @@ import pygame
 from config import *
 from sprite import Sprite
 
-def lcm(*args):
+
+def lcm(*args) -> int:
     import math
     from functools import reduce
     return reduce(lambda a, b: a * b // math.gcd(a, b), map(int, args))
 
 
 class TopMenu:
-    def __init__(self, cards):
+    def __init__(self, cards: list):
         # TODO добавить остальные цифры
         self.digits = {
             "1": pygame.image.load("assets/images/1.png").convert_alpha(),
@@ -32,7 +33,7 @@ class TopMenu:
 
             x += sizes["card"][0] + pads["cards"]
 
-    def update(self, screen, sun):
+    def update(self, screen, sun: int):
         self.frame.update(screen)
         self.cards.update(screen)
 
@@ -44,7 +45,7 @@ class TopMenu:
         #     screen.blit(image, (offset, pads["sun"][1]))
         #     offset += width
 
-    def choose_card(self, mouse_pos, previous_choice):
+    def choose_card(self, mouse_pos: tuple, previous_choice: type):
         for card in self.cards:
             if card.rect.collidepoint(mouse_pos):
                 choice = card.choose()
@@ -56,13 +57,14 @@ class TopMenu:
 
 
 class Card(Sprite):
-    def __init__(self, x, plant, image, size=None):
+    def __init__(self, x: int, plant: type,
+                 image: pygame.Surface, size: tuple = None):
         super().__init__(x, 8, image, size)
         self.plant = plant
         # Звук выбора растения
         self.sound = pygame.mixer.Sound("assets/audio/seedlift.wav")
 
-    def choose(self):
+    def choose(self) -> type:
         self.sound.play()
         return self.plant
 
@@ -70,7 +72,7 @@ class Card(Sprite):
 class Sun(Sprite):
     speedy = sun_speedY
 
-    def __init__(self, x, y, max_y, sunflower=False):
+    def __init__(self, x: int, y: int, max_y: int, sunflower: bool = False):
         super().__init__(x, y,
                          image=pygame.image.load("assets/images/sun.png").convert_alpha(),
                          size=sizes["sun"])
@@ -99,7 +101,7 @@ class Sun(Sprite):
 
         self._draw(screen)
 
-    def check_collision(self, coords):
+    def check_collision(self, coords: tuple) -> bool:
         if self.rect.collidepoint(coords):
             self.kill()
             self.pickup_sound.play()

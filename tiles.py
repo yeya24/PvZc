@@ -5,7 +5,7 @@ from sprite import Sprite
 
 
 class Tile(Sprite):
-    def __init__(self, col, row, can_build):
+    def __init__(self, col: int, row: int, can_build: bool):
         #  TODO добавить тени под растения
         super().__init__(col * sizes["cell"][0] + pads["game"][0],
                          row * sizes["cell"][1] + pads["game"][1],
@@ -25,7 +25,8 @@ class Tile(Sprite):
         if self.planted:
             self.planted.update(screen)
 
-    def plant(self, plant, suns, projectiles):
+    def plant(self, plant: type, suns: "pygame.sprite.Group",
+              projectiles: "pygame.sprite.Group") -> bool:
         if self.can_build and self.isempty():
             # Подсолнухам нужен доступ к группе солнц
             if plant.__name__ == "Sunflower":
@@ -40,7 +41,7 @@ class Tile(Sprite):
             return True
         return False
 
-    def isempty(self):
+    def isempty(self) -> bool:
         return not len(self.planted)
 
 
