@@ -15,8 +15,8 @@ class Projectile(Sprite):
         self.damage = damage
         self.row = row
         self.hit_sounds = [
-            pygame.mixer.Sound("assets/audio/splat2.wav"),
-            pygame.mixer.Sound("assets/audio/splat3.wav"),
+            pygame.mixer.Sound("audio/splat2.wav"),
+            pygame.mixer.Sound("audio/splat3.wav"),
         ]
 
     def deal_damage(self, target):
@@ -34,7 +34,7 @@ class PeashooterProjectile(Projectile):
     def __init__(self, x, y, row):
         super().__init__(x + 5, y + 5, row,
                          6, 20,
-                         pygame.image.load("assets/images/peaShooterProjectile.png").
+                         pygame.image.load("plants/peaShooterProjectile.png").
                          convert_alpha(),
                          size=sizes["projectile"])
 
@@ -43,11 +43,11 @@ class SnowProjectile(Projectile):
     freeze_time = fps * 1.5
 
     def __init__(self, x, y, row):
-        self.sound = pygame.mixer.Sound("assets/audio/snow_pea_sparkles.wav")
+        self.sound = pygame.mixer.Sound("audio/snow_pea_sparkles.wav")
         self.sound.play(-1)
         super().__init__(x + 5, y + 5, row,
                          6, 20,
-                         pygame.image.load("assets/images/snowPeaProjectile.png").
+                         pygame.image.load("plants/snowPeaProjectile.png").
                          convert_alpha(),
                          size=sizes["projectile"])
 

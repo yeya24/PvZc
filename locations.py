@@ -3,12 +3,12 @@ import random
 import pygame
 from pygame.locals import *
 
-from sprite import Sprite
 from animation import transform_image
 from config import *
-from other import Sun, TopMenu
+from other import LawnMover, Sun, TopMenu
+from sprite import Sprite
 from tiles import Grass
-from zombies import NormalZombie
+from zombies import NormalZombie, BucketHeadZombie
 
 
 class Location:
@@ -26,19 +26,31 @@ class Location:
         pass
 
 
-class StartLocation(Location):
+class MainMenuLocation(Location):
     def __init__(self, parent):
         super().__init__(parent)
 
     def update(self):
-        ...
+        self.parent.change_location(LevelPreparationLocation(self.parent))
 
     def event(self, event):
         ...
 
 
+class LevelPreparationLocation(Location):
+    def update(self):
+        # TODO выбор растений (choose your seeds)
+
+        # TODo Выбор уровня
+        data = object  # Данные уровня
+        from plants import PeaShooter, Sunflower, WallNut, PotatoMine, SnowPea, Repeater
+        self.parent.change_location(
+            GameLocation(self, data, [PeaShooter, Sunflower, WallNut,
+                                      PotatoMine, SnowPea, Repeater]))
+
+
 class GameLocation(Location):
-    def __init__(self, parent, cards):
+    def __init__(self, parent, level, cards):
         super().__init__(parent)
         # Инициализация игрового интерфейса
         self.plant_choice = self.plant_choice_image = None
@@ -47,9 +59,11 @@ class GameLocation(Location):
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
+        self.lawnmovers = [LawnMover(row) for row in range(5)]
+
         # Загрузка заднего фона
         self.background = Sprite(0, 0,
-                                 image=pygame.image.load("assets/images/sm_bg.png").convert_alpha(),
+                                 image=pygame.image.load("misc/sm_bg.png").convert_alpha(),
                                  size=sizes["win"])
         # Загрузка меню с индикацией солнышек и выбором цветов
         self.menubar = TopMenu(cards)
@@ -63,13 +77,14 @@ class GameLocation(Location):
             self.cells.append(grid_row)
 
         # Вызов падающего солнца каждые sun_drop_delay секунд
-        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
+        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 100)
         # Музыка
-        pygame.mixer_music.load("assets/audio/grasswalk.mp3")
+        pygame.mixer_music.load("audio/grasswalk.mp3")
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer_music.play(loops=-1)
 
         self.zombies.add(NormalZombie(0))
+        self.zombies.add(BucketHeadZombie(1))
 
     def update(self):
         self.background.update(self.screen)
@@ -108,6 +123,7 @@ class GameLocation(Location):
     def event(self, event):
         if event.type == USEREVENT + 1:
             self.drop_sun()
+            # self.zombies.add(NormalZombie(0))
 
         elif event.type == MOUSEBUTTONUP:
             x, y = pygame.mouse.get_pos()
@@ -123,28 +139,27 @@ class GameLocation(Location):
                     return
 
             # Выбор цветка / лопаты
-            if y < sizes["topmenu"][1]:
-                self.plant_choice = self.menubar.choose_card((x, y), self.plant_choice)
-                self.plant_choice_image = None
-                if self.plant_choice is not None:
-                    self.plant_choice_image = self.plant_choice.shadow.convert_alpha()
-            else:
-                # Быстрый способ выбрать клетку
-                # Если текущее количество солнц меньше стоимости выбранного растения
-                if self.plant_choice is None or self.suns < self.plant_choice.sunCost:
-                    return
+            self.plant_choice = self.menubar.choose_card((x, y), self.plant_choice)
+            self.plant_choice_image = None
+            if self.plant_choice is not None:
+                self.plant_choice_image = self.plant_choice.shadow.convert_alpha()
 
-                x -= pads["game"][0]
-                y -= pads["game"][1]
-                if x < 0 or y < 0:
-                    return
-                try:
-                    cell = self.cells[y // sizes["cell"][1]][x // sizes["cell"][0]]
-                    if cell.plant(self.plant_choice, self.suns_group, self.projectiles):
-                        self.suns -= self.plant_choice.sunCost
-                        self.plant_choice = self.plant_choice_image = None
-                except IndexError:
-                    return
+            # Быстрый способ выбрать клетку
+            # Если текущее количество солнц меньше стоимости выбранного растения
+            if self.plant_choice is None or self.suns < self.plant_choice.sunCost:
+                return
+
+            x -= pads["game"][0]
+            y -= pads["game"][1]
+            if x < 0 or y < 0:
+                return
+            try:
+                cell = self.cells[y // sizes["cell"][1]][x // sizes["cell"][0]]
+                if cell.plant(self.plant_choice, self.suns_group, self.projectiles):
+                    self.suns -= self.plant_choice.sunCost
+                    self.plant_choice = self.plant_choice_image = None
+            except IndexError:
+                return
 
     def drop_sun(self):
         max_y = random.randint(sizes["win"][1] // 3, sizes["win"][1] * 2 // 3)
@@ -178,8 +193,23 @@ class GameLocation(Location):
                     if plant.armed:
                         plant.explode(zombie)
 
-        # TODO проигрыш
+        # Проверка что зомби зашел
+        for zombie in self.zombies:
+            if zombie.col < 1:
+                landmover = self.lawnmovers[zombie.row]
+                if landmover is None: continue
+                landmover.run()
+
+        for ind, landmover in enumerate(self.lawnmovers):
+            if landmover is None:
+                continue
+            if landmover.update(self.screen):
+                self.lawnmovers[ind] = None
+                continue
+
+            for zombie in self.zombies:
+                if landmover.running and zombie.row == landmover.row and \
+                        landmover.rect.x > zombie.rect.x:
+                    zombie.kill()
 
 
-class LevelPreparationLocation(Location):
-    pass

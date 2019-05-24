@@ -19,7 +19,7 @@ class Tile(Sprite):
         # Игровые характеристики
         # Что находится сверху (горшок, цветок)
         self.planted = pygame.sprite.GroupSingle()
-        self.plant_sound = pygame.mixer.Sound("assets/audio/plant.wav")
+        self.plant_sound = pygame.mixer.Sound("audio/plant.wav")
 
     def update(self, screen):
         if self.planted:

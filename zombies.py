@@ -49,20 +49,20 @@ class Zombie(Sprite):
         self.row = row
         # Звуки
         self.chomps = [
-            pygame.mixer.Sound("assets/audio/chomp.wav"),
-            pygame.mixer.Sound("assets/audio/chomp2.wav"),
-            pygame.mixer.Sound("assets/audio/chompsoft.wav")
+            pygame.mixer.Sound("audio/chomp.wav"),
+            pygame.mixer.Sound("audio/chomp2.wav"),
+            pygame.mixer.Sound("audio/chompsoft.wav")
         ]
         self.groans = [
-            pygame.mixer.Sound("assets/audio/groan.wav"),
-            pygame.mixer.Sound("assets/audio/groan2.wav"),
-            pygame.mixer.Sound("assets/audio/groan3.wav"),
-            pygame.mixer.Sound("assets/audio/groan4.wav"),
-            pygame.mixer.Sound("assets/audio/groan5.wav"),
-            pygame.mixer.Sound("assets/audio/groan6.wav"),
+            pygame.mixer.Sound("audio/groan.wav"),
+            pygame.mixer.Sound("audio/groan2.wav"),
+            pygame.mixer.Sound("audio/groan3.wav"),
+            pygame.mixer.Sound("audio/groan4.wav"),
+            pygame.mixer.Sound("audio/groan5.wav"),
+            pygame.mixer.Sound("audio/groan6.wav"),
 
         ]
-        self.frozen_sound = pygame.mixer.Sound("assets/audio/frozen.wav")
+        self.frozen_sound = pygame.mixer.Sound("audio/frozen.wav")
         self.frozen_sound.set_volume(0.6)
         random.choice(self.groans).play()
 
@@ -141,7 +141,7 @@ class Zombie(Sprite):
 class NormalZombie(Zombie):
 
     def __init__(self, row: int):
-        images, size = get_images_from_sprite_sheet("assets/images/normalZombie.png",
+        images, size = get_images_from_sprite_sheet("zombies/normalZombie.png",
                                                     10, 5, ratio=4 / 5)
         super().__init__(row, images, size)
 
@@ -149,7 +149,7 @@ class NormalZombie(Zombie):
 class FlagZombie(Zombie):
 
     def __init__(self, row: int):
-        images, size = get_images_from_sprite_sheet("assets/images/flagZombie.png",
+        images, size = get_images_from_sprite_sheet("zombies/flagZombie.png",
                                                     10, 5, ratio=4 / 5)
 
         super().__init__(row, images, size)
@@ -159,7 +159,7 @@ class ConeHeadZombie(Zombie):
     health = 560
 
     def __init__(self, row: int):
-        images, size = get_images_from_sprite_sheet("assets/images/coneHeadZombie.png",
+        images, size = get_images_from_sprite_sheet("zombies/coneHeadZombie.png",
                                                     10, 5, ratio=4 / 5)
         super().__init__(row, images, size)
 
@@ -172,6 +172,6 @@ class BucketHeadZombie(Zombie):
     health = 1300
 
     def __init__(self, row: int):
-        images, size = get_images_from_sprite_sheet("assets/images/bucketHeadZombie.png",
+        images, size = get_images_from_sprite_sheet("zombies/bucketHeadZombie.png",
                                                     10, 5, ratio=4 / 5)
         super().__init__(row, images, size)
