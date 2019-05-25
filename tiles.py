@@ -5,19 +5,18 @@ from sprite import Sprite
 
 
 class Tile(Sprite):
+    """
+    Class for cell that has plants planted on it
+    """
     def __init__(self, col: int, row: int, can_build: bool):
         #  TODO добавить тени под растения
         super().__init__(col * sizes["cell"][0] + pads["game"][0],
                          row * sizes["cell"][1] + pads["game"][1],
                          size=sizes["cell"])
-        # Позиция в матрице
         self.row = row
         self.col = col
         self.coords = (row, col)
-        # можно строить
         self.can_build = can_build
-        # Игровые характеристики
-        # Что находится сверху (горшок, цветок)
         self.planted = pygame.sprite.GroupSingle()
         self.plant_sound = pygame.mixer.Sound("audio/plant.wav")
 
@@ -25,16 +24,20 @@ class Tile(Sprite):
         if self.planted:
             self.planted.update(screen)
 
-    def plant(self, plant: type, suns: "pygame.sprite.Group",
-              projectiles: "pygame.sprite.Group") -> bool:
+    def plant(self, plant: type, suns: pygame.sprite.Group,
+              projectiles: pygame.sprite.Group) -> bool:
+        """
+        Plants plant on the cell and gives arguments depending on the type
+        :param plant: plant to be planted type
+        :param suns: sun group from location for sunflower
+        :param projectiles: projectile group for peashooters
+        :return: True if planted
+        """
         if self.can_build and self.isempty():
-            # Подсолнухам нужен доступ к группе солнц
             if plant.__name__ == "Sunflower":
                 self.planted.add(plant(self, suns))
-            # Орех никак не взаимодействует с зомби и солнцами
             elif plant.__name__ in ["WallNut", "PotatoMine"]:
                 self.planted.add(plant(self))
-            # Стреляющим растениям нужен доступ к групппе пуль
             else:
                 self.planted.add(plant(self, projectiles))
             self.plant_sound.play()
@@ -42,6 +45,10 @@ class Tile(Sprite):
         return False
 
     def isempty(self) -> bool:
+        """
+        Checks if tile contains no plant
+        :return: bool
+        """
         return not len(self.planted)
 
 

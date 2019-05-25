@@ -6,7 +6,6 @@ XCells = 9
 sun_drop_delay = 10
 
 starting_sun = 50
-sun_speedY = 1.5
 
 sizes = {
     "win":        (830, 623),
@@ -18,12 +17,15 @@ sizes = {
     "zombie":     (72, 124),
     "plant":      (62, 62),
     "potatoExp":  (300, 200),
-    "lawnmover": (56, 48)
+    "lawnmover":  (56, 48),
+    "choose":     (475, 523),
+    "letsRock":   (158, 40)
 }
 
 pads = {
     "game":    (213, 170),
     "sun":     (85, 70),
     "menubar": (100, 0),
+    "choose":  (23, 141),
     "cards":   8,
 }

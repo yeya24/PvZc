@@ -1,23 +1,22 @@
+import random
+
 import pygame
 from pygame.locals import *
 
 from animation import get_images_from_sprite_sheet, transform_image
-from config import sizes, pads, fps, XCells
-from sprite import Sprite
+from config import fps, pads, sizes, XCells
 from other import lcm
-import random
-
-
-# Игра открывает txt файл с конфигурацией уровня
-# Там указан порядок появления зомби
-# Случайно выбирается линия поялвения
+from sprite import Sprite
 
 
 class Zombie(Sprite):
-    # Частота смены анимации
+    """
+    Complex base class for zombies
+    """
+    # Animation speed
     animation_frame = fps / 10
     counter = 0
-    # Характеристики (по стандарту обычного зомби)
+    # Characteristics
     health = 200
     speed = 0.23
     damage = 100
@@ -27,27 +26,28 @@ class Zombie(Sprite):
 
     def __init__(self, row, images, size):
         super().__init__(
-            sizes["win"][0],
+            sizes["win"][0],  # Right after the screen edge
             pads["game"][1] + (row - 3 / 4) * sizes["cell"][1],
             image=next(images), size=size
         )
-        # Анимация
-        # Итератор бесконечного цикла, меняющего изображения
+        # Animation
+        # Infinite iterator with images
+        # So image update can be easily called with next func
         self.images = images
-        # Поскольку скорость меньше чем 1, то нужно использовать окургление
+        # Real x pos, while rect x is floored
         self.x = self.rect.x
-        # Текущее растение для атаки
+        # Target enemy plant
         self.eating = pygame.sprite.GroupSingle()
-        # Заморозка идет на какое-то число секунд, в это время скорости снижаются
+        # Freeze chars - makes walking and attacking slower
         self.frozen = False
         self.frozen_reload = self.reload * 2
         self.frozen_speed = self.speed / 2
-        # После попадания пули в зомби он на некоторое число секунд становится белее
+        # After being shot makes nex image lighter
         self.shot = False
-        # Позиция на поле
+        # Game position
         self.col = XCells + 1
         self.row = row
-        # Звуки
+        # Sounds
         self.chomps = [
             pygame.mixer.Sound("audio/chomp.wav"),
             pygame.mixer.Sound("audio/chomp2.wav"),
@@ -67,29 +67,42 @@ class Zombie(Sprite):
         random.choice(self.groans).play()
 
     def update(self, screen):
+        """
+        Called every tick
+        Updates zombie
+
+        Either makes zombie go or attack
+        Regarding freeze caused py SnowPea's
+        Which makes everything slower
+        :param screen: pygame.display
+        :return: None
+        """
         self.counter += 1
-        # Обновление анимации ходьбы
-        # Или нанесение урона и анимация поедания
+        # Walk animation
+        # Or damage infliction
         if self.counter % self.animation_frame == 0:
             self.image = next(self.images)
+            # If zombie is frozen makes its image blue
             if self.frozen:
                 self.frozen -= 1
                 self.image = transform_image(self.image, r=0, g=0, b=128, alpha=5,
                                              special_flag=BLEND_RGBA_ADD)
+            # If zombie is hit makes it lighter
             if self.shot:
                 self.shot = False
                 self.image = transform_image(self.image,
                                              r=64, g=64, b=64, alpha=5,
                                              special_flag=BLEND_RGBA_ADD)
-        if not self.busy():  # Если зомби не ест
-            # Движение
+        if not self.busy():  # If zombie is not eating
+            # Movement
             if not self.frozen:
                 self.x -= self.speed
             else:
                 self.x -= self.frozen_speed
             self.rect.x = int(self.x) + 1
+            # Using flooring because pygame rect doesn't support not-int coordinates
         else:
-            # Нанесение урона раз в какой-то промежуток времени
+            # Damage infliction
             if (not self.frozen and self.counter % self.reload == 0) or \
                     (self.counter % self.frozen_reload == 0):
                 random.choice(self.chomps).play()
@@ -99,27 +112,47 @@ class Zombie(Sprite):
             random.choice(self.groans).play()
 
         self.counter %= lcm(self.reload, self.animation_frame, self.groan)
-        # Обновление координаты клетки игрового поля
+        # Update cell on the game field
         self.col = (self.rect.x - pads["game"][0] + sizes["cell"][0] / 2) // sizes["cell"][0]
         self._draw(screen)
 
     def busy(self) -> bool:
-        # Проверка, есть ли зомби
+        """
+        Checks if zombie is eating anything
+        :return: bool
+        """
         return bool(len(self.eating))
 
     def coords(self) -> tuple:
-        # Координаты на игровом поле
+        """
+        Returns coordinates on the game field
+        :return: (row, col)
+        """
         return self.row, self.col
 
     def change_target(self, enemy):
-        # Смена цели
+        """
+        Changes eating target on the given one
+        :param enemy: Plant
+        :return: None
+        """
         self.eating.add(enemy)
 
     def check_alive(self):
+        """
+        Kills itself if health below or equals zero
+        :return: None
+        """
         if self.health <= 0:
             self.kill()
 
     def take_damage(self, bullet):
+        """
+        Takes damage from bullet and removes it
+        Also makes self image blue if projectile.__class__ == SnowProjectile
+        :param bullet: Projectile
+        :return: None
+        """
         bullet.deal_damage(self)
         self.check_alive()
         bullet.kill()
@@ -134,12 +167,15 @@ class Zombie(Sprite):
         self.shot = True
 
     def deal_damage(self):
+        """
+        Lowers target plant health
+        :return: None
+        """
         self.eating.sprite.health -= self.damage
         self.eating.sprite.check_alive()
 
 
 class NormalZombie(Zombie):
-
     def __init__(self, row: int):
         images, size = get_images_from_sprite_sheet("zombies/normalZombie.png",
                                                     10, 5, ratio=4 / 5)
@@ -147,7 +183,6 @@ class NormalZombie(Zombie):
 
 
 class FlagZombie(Zombie):
-
     def __init__(self, row: int):
         images, size = get_images_from_sprite_sheet("zombies/flagZombie.png",
                                                     10, 5, ratio=4 / 5)

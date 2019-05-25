@@ -8,11 +8,13 @@ from sprite import Sprite
 
 
 class Plant(Sprite):
+    """
+    Base plant class
+    """
     counter = 0
-    # Изображение, которое будет отображаться при выборе этого растения
+    # Image which is displayed when plant is chosen to plant
     shadow = None
-    # Характеристики растения пишутуся здесь,
-    # Чтобы был доступ до инициализации класса
+    # Characteristics
     sunCost = 100
     health = 300
     recharge = 5
@@ -27,33 +29,39 @@ class Plant(Sprite):
         elif images is not None:
             self.images = images
             image = next(images)
-        # Расположение в центре клетки
+        # Positioning in the middle of the cell
         super().__init__(cell.rect.x + (sizes["cell"][0] - size[0]) / 2,
                          cell.rect.y + (sizes["cell"][1] - size[1]) / 2,
                          image=image, size=size)
-        # Частота обновления анимации
+        # Animations speed
         self.animation_frame = anim_speed
-        # Прочие характеристики
+
         self.coords = cell.coords
-        # Звук поедания зомби
+        # Sound of being eaten by zombie
         self.death_sound = pygame.mixer.Sound("audio/gulp.wav")
 
-    def update(self, screen):
-        if self.animation_frame is not None:
-            self.counter += 1
-            if self.counter % self.animation_frame == 0:
-                self.image = next(self.images)
-
-            self.counter %= self.animation_frame
-        self._draw(screen)
-
     def check_alive(self):
+        """
+        Kills itself if health if below of equals zero
+        :return: None
+        """
         if self.health <= 0:
             self.kill()
             self.death_sound.play()
 
+    def update(self, screen):
+        """
+        Makes plant act and draws it
+        :param screen: pygame.display
+        :return: None
+        """
+        pass
+
 
 class PeaShooter(Plant):
+    """
+    The most basic plant which shoots peas
+    """
     shadow = pygame.image.load("plants/peaShooter_.png")
 
     sunCost = 100
@@ -82,13 +90,15 @@ class PeaShooter(Plant):
         self._draw(screen)
 
     def shot(self):
-        # Создание зеленой пули
         b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
         self.shot_sound.play()
 
 
 class Sunflower(Plant):
+    """
+    Sunflower plant drops suns
+    """
     shadow = pygame.image.load("plants/sunflower_.png")
 
     sunCost = 50
@@ -117,6 +127,10 @@ class Sunflower(Plant):
         self._draw(screen)
 
     def generate_sun(self):
+        """
+        Adds sun to the location suns group
+        :return: None
+        """
         self.suns_group.add(
             Sun(self.rect.x, self.rect.top, self.rect.centery, True)
         )
@@ -124,13 +138,17 @@ class Sunflower(Plant):
 
 
 class PotatoMine(Plant):
+    """
+    Potato mine explodes with giant damage
+     after being armed for several seconds
+    """
     shadow = pygame.image.load("plants/potatoMine_.png")
 
     sunCost = 25
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 4
+    reload = fps * 14
 
     def __init__(self, cell):
         self.images, _ = get_images_from_sprite_sheet("plants/potatoMineReady.png",
@@ -169,6 +187,12 @@ class PotatoMine(Plant):
         self._draw(screen)
 
     def explode(self, enemy):
+        """
+        Deals damage to zombie
+         and displays explosion image
+        :param enemy: Zombie
+        :return: None
+        """
         self.image = self.explosion
         # Конфигурация положения изображения (т. к. размеры взрыва и обычные различаются)
         self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) // 2
@@ -180,6 +204,9 @@ class PotatoMine(Plant):
 
 
 class WallNut(Plant):
+    """
+    Wall nut simply can absorb a lot of damage
+    """
     shadow = pygame.transform.smoothscale(pygame.image.load("plants/wallNut_.png"),
                                           sizes["plant"])
     sunCost = 50
@@ -204,6 +231,9 @@ class WallNut(Plant):
 
 
 class CherryBomb(Plant):
+    """
+    Cherry bomb explodes in the 3 cell diameter
+    """
     shadow = None
 
     sunCost = 150
@@ -213,6 +243,9 @@ class CherryBomb(Plant):
 
 
 class Repeater(Plant):
+    """
+    Repeater is better peashooter which shoots two peas in a row
+    """
     shadow = pygame.image.load("plants/repeater_.png")
 
     sunCost = 200
@@ -248,6 +281,9 @@ class Repeater(Plant):
 
 
 class SnowPea(Plant):
+    """
+    Snow pea is a peashooter which shoots freezing projectiles
+    """
     shadow = pygame.image.load("plants/snowPea_.png")
 
     sunCost = 175
@@ -297,3 +333,6 @@ class Squash(Plant):
     recharge = 20
     damage = 1800
 
+
+class Jalapeno(Plant):
+    pass
