@@ -49,3 +49,6 @@ class PlantChoiceMenu:
             if card.rect.collidepoint(mouse_pos):
                 choice = card.choose()
                 return choice
+
+    def button_click(self, mouse_pos: tuple) -> bool:
+        return self.button.rect.collidepoint(mouse_pos)

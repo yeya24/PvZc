@@ -15,8 +15,8 @@ class Projectile(Sprite):
         self.damage = damage
         self.row = row
         self.hit_sounds = [
-            pygame.mixer.Sound("audio/splat2.wav"),
-            pygame.mixer.Sound("audio/splat3.wav"),
+            pygame.mixer.Sound("assets/audio/splat2.wav"),
+            pygame.mixer.Sound("assets/audio/splat3.wav"),
         ]
 
     def deal_damage(self, target):
