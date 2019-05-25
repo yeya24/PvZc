@@ -6,7 +6,8 @@ from .plant import Plant
 
 
 class Chomper(Plant):
-    shadow = pygame.image.load("assets/plants/chomper_.png")
+    shadow = pygame.transform.smoothscale(pygame.image.load("assets/plants/chomper_.png"),
+                                          sizes["plant"])
 
     sunCost = 150
     health = 300
