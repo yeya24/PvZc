@@ -4,6 +4,18 @@ import pygame
 from pygame.locals import *
 
 
+def lcm(*args) -> int:
+    """
+    Returns least common divider
+    Needed for updating frames
+    :param args: int
+    :return:
+    """
+    import math
+    from functools import reduce
+    return reduce(lambda a, b: a * b // math.gcd(a, b), map(int, args))
+
+
 def transform_image(image: pygame.Surface,
                     r: int = 255, g: int = 255, b: int = 255,
                     alpha: int = 128, special_flag: int = BLEND_RGBA_MULT) -> pygame.Surface:

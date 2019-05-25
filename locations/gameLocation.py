@@ -3,77 +3,12 @@ import random
 import pygame
 from pygame.locals import *
 
-from animation import transform_image
-from config import *
-from other import LawnMover, Sun, TopMenu, PlantChoiceMenu
-from sprite import Sprite
+from config import pads, sizes, sun_drop_delay, XCells, YCells
+from misc import transform_image
+from sprites import LawnMower, Sprite, Sun
 from tiles import Grass
-from zombies import BucketHeadZombie, NormalZombie
-
-
-class Location:
-    parent = None
-
-    def __init__(self, parent):
-        self.screen = pygame.display.get_surface()
-        # parent is needed for changing locations within locations
-        self.parent = parent
-
-    def event(self, event):
-        pass
-
-    def update(self):
-        pass
-
-
-class MainMenuLocation(Location):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-    def update(self):
-        self.parent.change_location(LevelPreparationLocation(self.parent))
-
-    def event(self, event):
-        ...
-
-
-class LevelPreparationLocation(Location):
-    def __init__(self, parent):
-        super().__init__(parent)
-        pygame.mixer_music.load("audio/chooseYourSeeds.mp3")
-        pygame.mixer_music.play(loops=-1)
-
-        self.bg = Sprite(0, 0,
-                         image=pygame.image.load("misc/bg.png").convert())
-        self.move_right_times = (self.bg.image.get_width() - sizes["win"][0]) / 5
-        from plants import PeaShooter, Sunflower, WallNut, PotatoMine, SnowPea, Repeater
-        self.plant_choice_widget = PlantChoiceMenu([PeaShooter, Sunflower, SnowPea])
-        self.top_menu = TopMenu(pos=0)
-
-    def update(self):
-        if self.move_right_times:
-            self.bg.rect.x -= 5
-            self.move_right_times -= 1
-
-        self.bg.update(self.screen)
-        if not self.move_right_times:
-            self.plant_choice_widget.update(self.screen, pygame.mouse.get_pos())
-            self.top_menu.update(self.screen, starting_sun)
-
-        # TODo Выбор уровня
-        # data = object  # Данные уровня
-        # from plants import PeaShooter, Sunflower, WallNut, PotatoMine, SnowPea, Repeater
-        # self.parent.change_location(
-        #     GameLocation(self, data, self.top_menu))
-        pass
-
-    def event(self, event):
-        if event.type == MOUSEBUTTONUP and event.button == 1:
-            mouse_pos = pygame.mouse.get_pos()
-            self.top_menu.remove_card(mouse_pos)
-            choice = self.plant_choice_widget.choose_card(mouse_pos)
-            if choice is not None:
-                self.top_menu.add_card(choice)
+from zombies import *
+from .location import Location
 
 
 class GameLocation(Location):
@@ -86,11 +21,11 @@ class GameLocation(Location):
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
-        self.lawnmovers = [LawnMover(row) for row in range(5)]
+        self.lawnmovers = [LawnMower(row) for row in range(5)]
 
         # Загрузка заднего фона
         self.background = Sprite(0, 0,
-                                 image=pygame.image.load("misc/sm_bg.png").convert_alpha(),
+                                 image=pygame.image.load("assets/misc/sm_bg.png").convert_alpha(),
                                  size=sizes["win"])
         # Загрузка меню с индикацией солнышек и выбором цветов
         self.menubar = top_menu
@@ -106,7 +41,7 @@ class GameLocation(Location):
         # Вызов падающего солнца каждые sun_drop_delay секунд
         pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
         # Музыка
-        pygame.mixer_music.load("audio/grasswalk.mp3")
+        pygame.mixer_music.load("assets/audio/grasswalk.mp3")
         pygame.mixer.music.set_volume(0.75)
         pygame.mixer_music.play(loops=-1)
 

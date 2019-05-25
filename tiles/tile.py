@@ -1,13 +1,14 @@
 import pygame
 
-from config import sizes, pads
-from sprite import Sprite
+from config import pads, sizes
+from sprites import Sprite
 
 
 class Tile(Sprite):
     """
     Class for cell that has plants planted on it
     """
+
     def __init__(self, col: int, row: int, can_build: bool):
         #  TODO добавить тени под растения
         super().__init__(col * sizes["cell"][0] + pads["game"][0],
@@ -18,7 +19,7 @@ class Tile(Sprite):
         self.coords = (row, col)
         self.can_build = can_build
         self.planted = pygame.sprite.GroupSingle()
-        self.plant_sound = pygame.mixer.Sound("audio/plant.wav")
+        self.plant_sound = pygame.mixer.Sound("assets/audio/plant.wav")
 
     def update(self, screen):
         if self.planted:
@@ -50,8 +51,3 @@ class Tile(Sprite):
         :return: bool
         """
         return not len(self.planted)
-
-
-class Grass(Tile):
-    def __init__(self, col, row):
-        super().__init__(col, row, True)
