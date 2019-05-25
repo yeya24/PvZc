@@ -37,7 +37,7 @@ class Tile(Sprite):
         if self.can_build and self.isempty():
             if plant.__name__ == "Sunflower":
                 self.planted.add(plant(self, suns))
-            elif plant.__name__ in ["WallNut", "PotatoMine"]:
+            elif plant.__name__ in ["WallNut", "PotatoMine", "Chomper"]:
                 self.planted.add(plant(self))
             else:
                 self.planted.add(plant(self, projectiles))

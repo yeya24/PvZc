@@ -112,7 +112,7 @@ class Zombie(Sprite):
 
         self.counter %= lcm(self.reload, self.animation_frame, self.groan)
         # Update cell on the game field
-        self.col = (self.rect.x - pads["game"][0] + sizes["cell"][0] / 2) // sizes["cell"][0]
+        self.col = int((self.rect.x - pads["game"][0] + sizes["cell"][0] / 2) // sizes["cell"][0])
         self._draw(screen)
 
     def busy(self) -> bool:

@@ -155,6 +155,14 @@ class GameLocation(Location):
                 if plant.__class__.__name__ == "PotatoMine":
                     if plant.armed:
                         plant.explode(zombie)
+        # Check if chompers can eat zombie
+        for zombie in self.zombies:
+            for cell in self.cells[zombie.row][zombie.col - 1: zombie.col + 1]:
+                plant = cell.planted.sprite
+                if plant.__class__.__name__ == "Chomper":
+                    if not plant.busy():
+                        plant.catch(zombie)
+                        continue
 
     def lawnmovers_update(self):
         """

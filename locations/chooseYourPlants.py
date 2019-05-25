@@ -17,8 +17,8 @@ class LevelPreparationLocation(Location):
         self.bg = Sprite(0, 0,
                          image=pygame.image.load("assets/misc/bg.png").convert())
         self.move_times = (self.bg.image.get_width() - sizes["win"][0]) / 5
-        from plants import PeaShooter, Sunflower, SnowPea
-        self.plant_choice_widget = PlantChoiceMenu([PeaShooter, Sunflower, SnowPea])
+        from plants import PeaShooter, PotatoMine, Chomper, SnowPea, Repeater, Sunflower
+        self.plant_choice_widget = PlantChoiceMenu([PeaShooter, Sunflower, SnowPea, PotatoMine, Chomper, Repeater])
         self.top_menu = TopMenu(pos=0)
 
         self.ready_set_plant = pygame.mixer.Sound("assets/audio/readysetplant.wav")
@@ -46,21 +46,24 @@ class LevelPreparationLocation(Location):
             self.top_menu.update(self.screen, starting_sun)
         elif self.counter:
             self.counter += 1
+            image = None
             if self.counter >= 100:
                 data = object
                 self.top_menu.move_right()
                 self.parent.change_location(
                     GameLocation(self, data, self.top_menu))
-                return
+                pass
             elif self.counter >= 80:
                 image = self.ready_set_plant_images[2]
             elif self.counter >= 40:
                 image = self.ready_set_plant_images[1]
             elif self.counter >= 5:
                 image = self.ready_set_plant_images[0]
+            if image is not None:
+
                 self.screen.blit(image,
                                  ((sizes["win"][0] - image.get_width()) / 2,
-                                  (sizes["win"][1] - image.get_height()) / 2))
+                                  (sizes["win"][1]  - image.get_height()) / 2))
 
     def event(self, event):
         if event.type == MOUSEBUTTONUP and event.button == 1:
