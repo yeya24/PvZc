@@ -38,6 +38,11 @@ class PeaShooter(Plant):
         self._draw(screen)
 
     def shot(self):
+        """
+        Creates PeashooterBullet object
+        and adds it to the location projectiles group
+        :return: None
+        """
         b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
         self.shot_sound.play()

@@ -6,7 +6,7 @@ from sprites import Sprite
 
 class Tile(Sprite):
     """
-    Class for cell that has plants planted on it
+    Class for cell that has plants planted on
     """
 
     def __init__(self, col: int, row: int, can_build: bool):

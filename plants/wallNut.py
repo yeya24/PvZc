@@ -1,13 +1,14 @@
 import pygame
+from pygame.locals import *
 
 from config import sizes
-from misc import get_images_from_sprite_sheet
+from misc import get_images_from_sprite_sheet, transform_image
 from .plant import Plant
 
 
 class WallNut(Plant):
     """
-    Wall nut simply can absorb a lot of damage
+    Wall-Nut simply can absorb a lot of damage
     """
     shadow = pygame.transform.smoothscale(pygame.image.load("assets/plants/wallNut_.png"),
                                           sizes["plant"])
@@ -23,7 +24,7 @@ class WallNut(Plant):
         self.max_health = self.health
 
     def update(self, screen):
-        # TODO добавить небольшое движение, использовать анимации
+        # TODO add motion
         if self.health < self.max_health * 2 / 3:
             self.image = self.images[1]
         elif self.health < self.max_health / 3:

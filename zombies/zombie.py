@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 
 from config import fps, pads, sizes, XCells
-from misc import lcm, transform_image
+from misc import lcm, transform_image, get_images_from_sprite_sheet
 from sprites import Sprite
 
 
@@ -64,6 +64,10 @@ class Zombie(Sprite):
         self.frozen_sound = pygame.mixer.Sound("assets/audio/frozen.wav")
         self.frozen_sound.set_volume(0.6)
         random.choice(self.groans).play()
+        # Burn animation
+        self.ignited, _ = get_images_from_sprite_sheet("assets/zombies/incinerated.png",
+                                                      6, 5, size=sizes["zombie"])
+        self.incinerated = False
 
     def update(self, screen):
         """
@@ -76,6 +80,16 @@ class Zombie(Sprite):
         :param screen: pygame.display
         :return: None
         """
+
+        if self.incinerated:
+            self.incinerated -= 1
+            if self.incinerated % self.animation_frame == 0:
+                self.image = next(self.ignited)
+            self._draw(screen)
+            if self.incinerated == 0:
+                self.kill()
+            return
+
         self.counter += 1
         # Walk animation
         # Or damage infliction
@@ -170,5 +184,12 @@ class Zombie(Sprite):
         Lowers target plant health
         :return: None
         """
-        self.eating.sprite.health -= self.damage
-        self.eating.sprite.check_alive()
+        self.eating.sprite.take_damage(self.damage)
+
+    def ignite(self):
+        """
+        Plays ignite animation and dies after
+        Needed as kill animation for CherryBomb
+        :return: None
+        """
+        self.incinerated = self.animation_frame * 30

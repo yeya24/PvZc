@@ -1,6 +1,8 @@
 import pygame
+from pygame.locals import *
 
 from config import sizes
+from misc import transform_image
 from sprites import Sprite
 
 
@@ -33,7 +35,10 @@ class Plant(Sprite):
         # Animations speed
         self.animation_frame = anim_speed
 
+        self.row = cell.row
+        self.col = cell.col
         self.coords = cell.coords
+        self.next_white = True
         # Sound of being eaten by zombie
         self.death_sound = pygame.mixer.Sound("assets/audio/gulp.wav")
 
@@ -46,10 +51,30 @@ class Plant(Sprite):
             self.kill()
             self.death_sound.play()
 
+    def _draw(self, screen):
+        image = self.image
+        if self.next_white:
+            print(1)
+            image = transform_image(image,
+                                    r=64, g=64, b=64, alpha=5,
+                                    special_flag=BLEND_RGBA_ADD)
+            self.next_white -= 1
+        screen.blit(image, self.rect)
+
     def update(self, screen):
         """
         Makes plant act and draws it
-        :param screen: pygame.display
+        :param screen: Surface
         :return: None
         """
         pass
+
+    def take_damage(self, damage: int):
+        """
+        Take damage and set next several frames image more white
+        :param damage:
+        :return:
+        """
+        self.health -= damage
+        self.next_white = 10
+        self.check_alive()

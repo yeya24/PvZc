@@ -41,10 +41,12 @@ class PotatoMine(Plant):
                 if self.counter == self.reload:
                     self.image = next(self.images)
                     self.counter, self.armed = 0, True
+
                 elif self.counter > self.reload * 2 // 3:
                     self.image = self.arming[2]
                 elif self.counter > self.reload // 3:
                     self.image = self.arming[1]
+
             elif self.counter == self.animation_frame:
                 self.image = next(self.images)
                 self.counter = 0
@@ -62,10 +64,10 @@ class PotatoMine(Plant):
         :return: None
         """
         self.image = self.explosion
-        # Конфигурация положения изображения (т. к. размеры взрыва и обычные различаются)
+        # Configure image position
         self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) // 2
         self.rect.y -= (sizes["potatoExp"][1] - sizes["cell"][1]) // 1.2
         enemy.health -= self.damage
         enemy.check_alive()
-        self.health = 0  # Для начала отображения изображения взрыва
+        self.health = 0  # Start displaying explosion
         self.detonation_sound.play()

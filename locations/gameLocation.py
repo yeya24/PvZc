@@ -39,7 +39,7 @@ class GameLocation(Location):
             self.cells.append(grid_row)
 
         # Вызов падающего солнца каждые sun_drop_delay секунд
-        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
+        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 200)
         # Музыка
         pygame.mixer_music.load("assets/audio/grasswalk.mp3")
         pygame.mixer.music.set_volume(0.75)
@@ -93,6 +93,7 @@ class GameLocation(Location):
 
         elif event.type == MOUSEBUTTONUP and event.button == 1:
             x, y = pygame.mouse.get_pos()
+            print((x, y))
             # Проверка:
             # 1. Что игрок кликнул по падающему солнцу
             # 2. Что игрок выбрал что-либо на верхнем меню
@@ -101,7 +102,7 @@ class GameLocation(Location):
             # Проверка всех солнц на пересечение с местом клика
             for sun in self.suns_group:
                 if sun.check_collision((x, y)):
-                    self.suns += 25
+                    sun.fly()
                     return
 
             # Выбор цветка / лопаты
@@ -141,28 +142,40 @@ class GameLocation(Location):
         Checks all projectiles on collisions with zombies
         Calls zombie method take_damage if so
         """
-        # Checks for hits
-        for projectile in self.projectiles:
-            for zombie in self.zombies:
-                if projectile.row == zombie.row and projectile.rect.x >= zombie.rect.x:
-                    zombie.take_damage(projectile)
-                    break
-        # Checks for potato mine explosions
         for zombie in self.zombies:
-            for cell in filter(lambda cell: not cell.isempty() and cell.col == zombie.col,
+            # Checks for hits
+            for projectile in filter(lambda projectile:
+                                     projectile.row == zombie.row and
+                                     projectile.rect.x >= zombie.rect.x,
+                                     self.projectiles):
+                zombie.take_damage(projectile)
+
+            # Checks for potato mine explosions
+            for cell in filter(lambda cell: cell.col == zombie.col,
                                self.cells[zombie.row]):
                 plant = cell.planted.sprite
                 if plant.__class__.__name__ == "PotatoMine":
                     if plant.armed:
                         plant.explode(zombie)
-        # Check if chompers can eat zombie
-        for zombie in self.zombies:
+
+            # Check if chompers can eat zombie
             for cell in self.cells[zombie.row][zombie.col - 1: zombie.col + 1]:
                 plant = cell.planted.sprite
                 if plant.__class__.__name__ == "Chomper":
                     if not plant.busy():
                         plant.catch(zombie)
-                        continue
+
+        # Check for cherryBomb explosion
+        for row in self.cells:
+            for cell in row:
+                plant = cell.planted.sprite
+                if plant.__class__.__name__ == "CherryBomb":
+                    if plant.armed and plant.health > 0:
+                        row, col = plant.coords
+                        plant.explode(*filter(
+                            lambda zombie: zombie.row in [row - 1, row, row + 1] and
+                                           zombie.col in [col - 1, col, col + 1], self.zombies)
+                                      )
 
     def lawnmovers_update(self):
         """

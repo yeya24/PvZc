@@ -6,7 +6,7 @@ from .sprite import Sprite
 
 class LawnMower(Sprite):
     """
-    Lawn mover class
+    Lawn Mower class
     Which stay still on the lift side of the field
     and run and kill everything on the line if zombie comes close to the house
     """
@@ -27,7 +27,7 @@ class LawnMower(Sprite):
         """
         Changes position if running
         Returns True if is out of window bounds
-        :param screen: pygame.display
+        :param screen: Surface
         :return : bool
         """
         if self.running:
@@ -39,5 +39,9 @@ class LawnMower(Sprite):
         return False
 
     def run(self):
+        """
+        Start going right and slaughter zombies
+        :return: None
+        """
         self.sound.play()
         self.running = True

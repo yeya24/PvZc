@@ -37,6 +37,11 @@ class SnowPea(Plant):
         self._draw(screen)
 
     def shot(self):
+        """
+        Creates SnowProjectile object
+        and adds it to the location projectiles group
+        :return: None
+        """
         b = SnowProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
         self.shot_sound.play()

@@ -5,9 +5,13 @@ from .projectile import Projectile
 
 
 class SnowProjectile(Projectile):
+    """
+    Modified PeashooterProjectile
+    which deals 20 damage and also freezes enemy
+    """
     freeze_time = fps * 1.5
 
-    def __init__(self, x, y, row):
+    def __init__(self, x: int, y: int, row: int):
         self.sound = pygame.mixer.Sound("assets/audio/snow_pea_sparkles.wav")
         self.sound.play(-1)
         super().__init__(x + 5, y + 5, row,

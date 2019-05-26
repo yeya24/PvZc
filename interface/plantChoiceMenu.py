@@ -19,16 +19,28 @@ class PlantChoiceMenu:
         )
         self.button = Sprite(158, 568, image=self.button_images[0])
 
-        # TODO make several layers support
         self.cards = pygame.sprite.Group()
         self.x = pads["choose"][0]
+        self.starting_x = self.x
+        y = pads["choose"][1]
+        c = 0
         for card in cards:
+            c += 1
             image = pygame.image.load(f"assets/cards/card{card.__name__}.png").convert()
-            s = Card(self.x, card, image=image, size=sizes["card"], y=pads["choose"][1])
+            s = Card(self.x, card, image=image, size=sizes["card"], y=y)
             self.cards.add(s)
-            self.x += sizes["card"][0] + 1
+            self.x += sizes["card"][0] + 2
+            if c % 7 == 0:
+                self.x = self.starting_x
+                y += sizes["card"][1] + 5
 
     def update(self, screen, mouse_pos):
+        """
+        :param screen: Surface
+        :param mouse_pos: (x, y)
+        :return:
+        """
+        # Marks the Let's Rock button if mouse collides with it
         if self.button.rect.collidepoint(mouse_pos):
             self.button.image = self.button_images[1]
         else:

@@ -42,7 +42,7 @@ class TopMenu:
     def update(self, screen, sun: int):
         """
         Updates all parts of the interface
-        :param screen: pygame.display
+        :param screen: Surface
         :param sun: sun count int
         :return: None
         """
@@ -75,6 +75,8 @@ class TopMenu:
         return previous_choice
 
     def add_card(self, plant: type):
+        if len(self.cards) > 5:
+            return
         if any(filter(lambda card: card.plant == plant, self.cards)):
             return
         s = Card(self.x,
@@ -87,10 +89,11 @@ class TopMenu:
         """
         Removes clicked card and moves other to the left
         :param mouse_pos: (x, y)
-        :return:
+        :return: None
         """
         for card in self.cards:
             if card.rect.collidepoint(mouse_pos):
+                card.sound.play()
                 self.cards.remove(card)
                 x = self.starting_x
                 for card in self.cards:
@@ -100,6 +103,11 @@ class TopMenu:
                 return
 
     def move_right(self):
+        """
+        After removing card all cards need to be moved left
+        To remove gap
+        :return: None
+        """
         dx = pads["menubar"][0]
 
         self.x += dx

@@ -30,15 +30,20 @@ class Repeater(Plant):
         self.counter += 1
         if self.counter % self.animation_frame == 0:
             self.image = next(self.images)
-        if self.counter % self.reload == 0:
+        if self.counter % self.reload == 0:  # First shot
             self.shot()
-        elif (self.counter - 10) % self.reload == 0:
+        elif (self.counter - 10) % self.reload == 0:  # Second shot
             self.shot()
 
         self.counter %= lcm(self.reload, self.reload + 10, self.animation_frame)
         self._draw(screen)
 
     def shot(self):
+        """
+        Creates PeashooterBullet object
+        and adds it to the location projectiles group
+        :return: None
+        """
         b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
         self.projectiles.add(b)
         self.shot_sound.play()

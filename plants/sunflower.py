@@ -8,7 +8,7 @@ from .plant import Plant
 
 class Sunflower(Plant):
     """
-    Sunflower plant drops suns
+    Sunflower drops suns
     """
     shadow = pygame.image.load("assets/plants/sunflower_.png")
 
@@ -39,7 +39,8 @@ class Sunflower(Plant):
 
     def generate_sun(self):
         """
-        Adds sun to the location suns group
+        Creates Sun object
+        and adds it to the location projectiles group
         :return: None
         """
         self.suns_group.add(

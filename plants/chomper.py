@@ -32,36 +32,46 @@ class Chomper(Plant):
         self.counter += 1
         if self.counter % self.animation_frame == 0:
             if self.eating:
-
+                # 2 is used to mark the first time eating
                 if self.eating == 2:
                     self.rect.y += 35
                     self.eating = True
                 self.image = next(self.eating_animation)
-
+                # Wait for end of eating
                 if self.reload_count:
                     self.reload_count -= 1
                     if self.reload_count == 0:
                         self.eating = False
-
+            # Zombie catching animation
             elif self.catching:
-                self.animation_frame = 3
                 self.catching -= 1
                 self.image = next(self.catching_animation)
-
                 if self.catching == 0:
                     self.eating = 2
                     self.target.kill()
             else:
+                # Usual state
                 self.image = next(self.images)
 
         self.counter %= self.animation_frame
         self._draw(screen)
 
     def catch(self, zombie):
+        """
+        Start of catching animation
+        kills zombie after it
+        :param zombie: Zombie
+        :return: None
+        """
         self.target = zombie
         self.catching = 20
+        self.animation_frame = 3
         self.rect.y -= 35
         self.reload_count = self.reload
 
     def busy(self) -> bool:
+        """
+        Checks if Chomper is eating something
+        :return: True if chomper eating
+        """
         return self.eating or self.catching or self.reload_count

@@ -8,6 +8,7 @@ class Sprite(pygame.sprite.Sprite):
     Or loads image from given path
     Changes size of image if size is given
     Has rect with given x and y coordinates
+    Which refer to the left top corner
     """
 
     def __init__(self, x: int, y: int,
@@ -26,7 +27,18 @@ class Sprite(pygame.sprite.Sprite):
         self.rect.topleft = (x, y)
 
     def _draw(self, screen):
+        """
+        Draws image on rect positions
+        :param screen: Surface
+        :return: None
+        """
         screen.blit(self.image, self.rect)
 
     def update(self, screen):
+        """
+        Combined method
+        Used to update object logic and call drawing
+        :param screen: Surface
+        :return: None
+        """
         self._draw(screen)
