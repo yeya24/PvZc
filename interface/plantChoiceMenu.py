@@ -48,7 +48,7 @@ class PlantChoiceMenu:
 
         self.frame.update(screen)
         self.button.update(screen)
-        self.cards.update(screen)
+        self.cards.update(screen, float("inf"))
 
     def choose_card(self, mouse_pos: tuple) -> type:
         """

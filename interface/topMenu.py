@@ -19,11 +19,7 @@ class TopMenu:
         # TODO добавить остальные цифры
         # Digits for sun display
         self.digits = {
-            "1": pygame.image.load("assets/misc/1.png").convert_alpha(),
-            "2": pygame.image.load("assets/misc/2.png").convert_alpha(),
-            "5": pygame.image.load("assets/misc/5.png").convert_alpha(),
-            "7": pygame.image.load("assets/misc/7.png").convert_alpha(),
-            "0": pygame.image.load("assets/misc/0.png").convert_alpha(),
+            str(n): pygame.image.load(f"assets/misc/{n}.png").convert_alpha() for n in range(10)
         }
         # Main frame
         self.frame = Sprite(pos, 0,
@@ -47,15 +43,16 @@ class TopMenu:
         :return: None
         """
         self.frame.update(screen)
-        self.cards.update(screen)
+        self.cards.update(screen, sun)
 
-        # score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
-        # digit_widths = list(map(lambda image: image.get_width(), score_digits))
-        #
-        # offset = pads["menubar"][0] + (pads["sun"][0] - sum(digit_widths)) // 2
-        # for image, width in zip(score_digits, digit_widths):
-        #     screen.blit(image, (offset, pads["sun"][1]))
-        #     offset += width
+        score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
+        digit_widths = list(map(lambda image: image.get_width(), score_digits))
+
+        offset = (pads["sun"][0] - sum(digit_widths)) // 2 + (
+            pads["menubar"][0] if self.frame.rect.x == 100 else 0)
+        for image, width in zip(score_digits, digit_widths):
+            screen.blit(image, (offset, pads["sun"][1]))
+            offset += width
 
     def choose_card(self, mouse_pos: tuple, previous_choice: type) -> type:
         """
@@ -114,3 +111,8 @@ class TopMenu:
         for card in self.cards:
             card.rect.x += dx
         self.frame.rect.x += dx
+
+    def lock_card(self, plant: type):
+        for card in self.cards:
+            if card.plant == plant:
+                card.set_timer()

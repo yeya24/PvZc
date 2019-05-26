@@ -3,7 +3,7 @@ import random
 import pygame
 from pygame.locals import *
 
-from config import pads, sizes, sun_drop_delay, XCells, YCells
+from config import pads, sizes, sun_drop_delay, XCells, YCells, starting_sun
 from misc import transform_image
 from sprites import LawnMower, Sprite, Sun
 from tiles import Grass
@@ -16,7 +16,7 @@ class GameLocation(Location):
         super().__init__(parent)
         # Инициализация игрового интерфейса
         self.plant_choice = self.plant_choice_image = None
-        self.suns = 2500  # starting_sun
+        self.suns = starting_sun  # starting_sun
         # Группы спрайтов солнц и зомби, т. к. порядок их отображения не важен
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
@@ -39,7 +39,7 @@ class GameLocation(Location):
             self.cells.append(grid_row)
 
         # Вызов падающего солнца каждые sun_drop_delay секунд
-        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 200)
+        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
         # Музыка
         pygame.mixer_music.load("assets/audio/grasswalk.mp3")
         pygame.mixer.music.set_volume(0.75)
@@ -103,6 +103,7 @@ class GameLocation(Location):
             for sun in self.suns_group:
                 if sun.check_collision((x, y)):
                     sun.fly()
+                    self.suns += 25
                     return
 
             # Выбор цветка / лопаты
@@ -123,6 +124,7 @@ class GameLocation(Location):
             try:
                 cell = self.cells[y // sizes["cell"][1]][x // sizes["cell"][0]]
                 if cell.plant(self.plant_choice, self.suns_group, self.projectiles):
+                    self.menubar.lock_card(self.plant_choice)
                     self.suns -= self.plant_choice.sunCost
                     self.plant_choice = self.plant_choice_image = None
             except IndexError:

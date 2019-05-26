@@ -1,7 +1,9 @@
 import pygame
+from pygame.locals import *
 
+from config import fps
 from sprites import Sprite
-
+from misc import grayscale
 
 class Card(Sprite):
     """
@@ -15,10 +17,31 @@ class Card(Sprite):
         self.plant = plant
         # Plant choice sound
         self.sound = pygame.mixer.Sound("assets/audio/seedlift.wav")
+        self.negative = grayscale(self.image)
+        self.counter = 0
+
+    def update(self, screen, sun):
+        if self.counter:
+            self.counter -= 1
+            neg = self.negative.copy()
+            y = int(self.image.get_height() * (self.counter / (self.plant.recharge * fps)))
+            rect = (0, y,  self.image.get_width(), self.image.get_height() - y)
+            col = pygame.Surface((rect[2], rect[3]))
+            col.blit(self.image, (rect[0], -rect[1]))
+            neg.blit(col, rect)
+            screen.blit(neg, self.rect)
+        elif sun >= self.plant.sunCost:
+            self._draw(screen)
+        else:
+            screen.blit(self.negative, self.rect)
 
     def choose(self) -> type:
         """
         :return: plant choice type
         """
-        self.sound.play()
-        return self.plant
+        if not self.counter:
+            self.sound.play()
+            return self.plant
+
+    def set_timer(self):
+        self.counter = self.plant.recharge * fps
