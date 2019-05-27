@@ -54,7 +54,6 @@ class Plant(Sprite):
     def _draw(self, screen):
         image = self.image
         if self.next_white:
-            print(1)
             image = transform_image(image,
                                     r=64, g=64, b=64, alpha=5,
                                     special_flag=BLEND_RGBA_ADD)
@@ -78,3 +77,11 @@ class Plant(Sprite):
         self.health -= damage
         self.next_white = 10
         self.check_alive()
+
+    @classmethod
+    def get_shadow(cls):
+        """
+        Returns converted and resized image
+        :return: Surface
+        """
+        return pygame.transform.smoothscale(cls.shadow.convert_alpha(), sizes["plant"])

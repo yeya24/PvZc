@@ -6,8 +6,7 @@ from .plant import Plant
 
 
 class Chomper(Plant):
-    shadow = pygame.transform.smoothscale(pygame.image.load("assets/plants/chomper_.png"),
-                                          sizes["plant"])
+    shadow = pygame.image.load("assets/plants/chomper_.png")
 
     sunCost = 150
     health = 300
@@ -46,9 +45,12 @@ class Chomper(Plant):
             elif self.catching:
                 self.catching -= 1
                 self.image = next(self.catching_animation)
+                if self.catching == 10:
+                    self.chop_sound.play()
                 if self.catching == 0:
                     self.eating = 2
                     self.target.kill()
+
             else:
                 # Usual state
                 self.image = next(self.images)

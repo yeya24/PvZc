@@ -46,7 +46,7 @@ class CherryBomb(Plant):
         Explodes - deals massive damage in 1 cell radius
         for a period of time displays explosion animation
         :param zombies: any iterator with Zombie objects
-        :return:
+        :return: None
         """
         # Configure position
         self.rect.y -= 50
@@ -59,3 +59,7 @@ class CherryBomb(Plant):
         self.images = self.explosion
         self.health = self.counter = 0
         self.explode_sound.play()
+
+    @classmethod
+    def get_shadow(cls):
+        return cls.shadow

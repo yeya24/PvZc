@@ -20,6 +20,7 @@ class Tile(Sprite):
         self.can_build = can_build
         self.planted = pygame.sprite.GroupSingle()
         self.plant_sound = pygame.mixer.Sound("assets/audio/plant.wav")
+        self.shovel_sound = pygame.mixer.Sound("assets/audio/Shovel.ogg")
 
     def update(self, screen):
         if self.planted:
@@ -46,6 +47,27 @@ class Tile(Sprite):
             self.plant_sound.play()
             return True
         return False
+
+    def remove_plant(self) -> bool:
+        """
+        Player removes player from the cell using shovel
+        :return: True if plant has been removed
+        """
+        for s in self.planted:
+            s.kill()
+            self.shovel_sound.play()
+            return True
+        return False
+
+    def get_middle_pos(self, image):
+        """
+        Return tuple containing x and y positions
+        for displaying plant image in the middle of the cell
+        :param image: Surface
+        :return: (x, y)
+        """
+        return (self.rect.x + (self.rect.width - image.get_width()) / 2,
+                self.rect.y + (self.rect.height - image.get_height()) / 2)
 
     def isempty(self) -> bool:
         """

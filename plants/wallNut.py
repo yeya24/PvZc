@@ -10,8 +10,7 @@ class WallNut(Plant):
     """
     Wall-Nut simply can absorb a lot of damage
     """
-    shadow = pygame.transform.smoothscale(pygame.image.load("assets/plants/wallNut_.png"),
-                                          sizes["plant"])
+    shadow = pygame.image.load("assets/plants/wallNut_.png")
     sunCost = 50
     health = 3600
     recharge = 20

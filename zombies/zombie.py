@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 
 from config import fps, pads, sizes, XCells
-from misc import lcm, transform_image, get_images_from_sprite_sheet
+from misc import get_images_from_sprite_sheet, lcm, transform_image
 from sprites import Sprite
 
 
@@ -66,7 +66,7 @@ class Zombie(Sprite):
         random.choice(self.groans).play()
         # Burn animation
         self.ignited, _ = get_images_from_sprite_sheet("assets/zombies/incinerated.png",
-                                                      6, 5, size=sizes["zombie"])
+                                                       6, 5, size=sizes["zombie"])
         self.incinerated = False
 
     def update(self, screen):
