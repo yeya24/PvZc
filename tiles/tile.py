@@ -1,6 +1,6 @@
 import pygame
 
-from config import pads, sizes
+import config as c
 from sprites import Sprite
 
 
@@ -10,10 +10,9 @@ class Tile(Sprite):
     """
 
     def __init__(self, col: int, row: int, can_build: bool):
-        #  TODO добавить тени под растения
-        super().__init__(col * sizes["cell"][0] + pads["game"][0],
-                         row * sizes["cell"][1] + pads["game"][1],
-                         size=sizes["cell"])
+        super().__init__(col * c.sizes["cell"][0] + c.pads["game"][0],
+                         row * c.sizes["cell"][1] + c.pads["game"][1],
+                         size=c.sizes["cell"])
         self.row = row
         self.col = col
         self.coords = (row, col)
@@ -38,9 +37,7 @@ class Tile(Sprite):
         if self.can_build and self.isempty():
             if plant.__name__ == "Sunflower":
                 self.planted.add(plant(self, suns))
-            elif plant.__name__ in ["WallNut", "PotatoMine",
-                                    "Chomper", "CherryBomb",
-                                    "Jalapeno", "Squash"]:
+            elif plant.__name__ in c.passive_plants:
                 self.planted.add(plant(self))
             else:
                 self.planted.add(plant(self, projectiles))

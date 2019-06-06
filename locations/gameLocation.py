@@ -3,20 +3,20 @@ import random
 import pygame
 from pygame.locals import *
 
-from config import pads, sizes, starting_sun, sun_drop_delay, XCells, YCells
+import config as c
 from misc import transform_image
 from sprites import LawnMower, Sprite, Sun
 from tiles import Grass
 from zombies import *
-from .location import Location
+from ._location import _Location
 
 
-class GameLocation(Location):
-    def __init__(self, parent, level, top_menu):
+class GameLocation(_Location):
+    def __init__(self, parent, top_menu):
         super().__init__(parent)
         # Game interface
         self.plant_choice = self.plant_choice_image = None
-        self.suns = starting_sun + 2000  # starting_sun
+        self.suns = c.starting_sun + 2000
         # Sprite groups for different game objects
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
@@ -26,20 +26,20 @@ class GameLocation(Location):
         # Background is a sprite for easier drawing
         self.background = Sprite(0, 0,
                                  image=pygame.image.load("assets/misc/sm_bg.png").convert_alpha(),
-                                 size=sizes["win"])
+                                 size=c.sizes["win"])
         # Menu with plant choices, shovel and suns count indication
         self.menubar = top_menu
         # Creating game field
         self.cells = []
-        for y in range(YCells):
+        for y in range(c.YCells):
             grid_row = []
-            for x in range(XCells):
+            for x in range(c.XCells):
                 tile = Grass(x, y)
                 grid_row.append(tile)
             self.cells.append(grid_row)
 
         # Adds event of falling sun for every sun_drop_delay seconds
-        pygame.time.set_timer(USEREVENT + 1, sun_drop_delay * 1000)
+        pygame.time.set_timer(USEREVENT + 1, c.sun_drop_delay * 1000)
         # Music
         pygame.mixer_music.load("assets/audio/grasswalk.mp3")
         pygame.mixer.music.set_volume(0.75)
@@ -64,10 +64,10 @@ class GameLocation(Location):
                     # In the middle of the cell
                     self.screen.blit(transform_image(self.plant_choice_image),
                                      cell.get_middle_pos(self.plant_choice_image))
-        self.lawnmovers_update()
+        self.lawnmowers_update()
         # Start drawing from right top
         for zombie in sorted(self.zombies.sprites(),
-                             key=lambda z: z.row * XCells + z.col):
+                             key=lambda z: z.row * c.XCells + z.col):
             zombie.update(self.screen)
         self.zombie_targeting()
         # Draw choice near the mouse
@@ -119,24 +119,29 @@ class GameLocation(Location):
                 if self.plant_choice is None or self.suns < self.plant_choice.sunCost:
                     return
 
-            x -= pads["game"][0]
-            y -= pads["game"][1]
+            x -= c.pads["game"][0]
+            y -= c.pads["game"][1]
             if x < 0 or y < 0:
+                if self.plant_choice.__class__.__name__ == "Shovel":
+                    self.plant_choice.put_back()
                 self.plant_choice = self.plant_choice_image = None
                 return
+
             try:
-                cell = self.cells[y // sizes["cell"][1]][x // sizes["cell"][0]]
-                if self.plant_choice.__class__.__name__ == "Shovel":
-                    # If player is using shovel remove plant
-                    if cell.remove_plant():
-                        self.plant_choice.put_back()
-                        self.plant_choice = self.plant_choice_image = None
-                elif cell.plant(self.plant_choice, self.suns_group, self.projectiles):
-                    # Else plant
-                    self.menubar.lock_card(self.plant_choice)
-                    self.suns -= self.plant_choice.sunCost
-                    self.plant_choice = self.plant_choice_image = None
+                cell = self.cells[y // c.sizes["cell"][1]][x // c.sizes["cell"][0]]
             except IndexError:
+                self.plant_choice = self.plant_choice_image = None
+                return
+
+            if self.plant_choice.__class__.__name__ == "Shovel":
+                # If player is using shovel remove plant
+                if cell.remove_plant():
+                    self.plant_choice.put_back()
+                    self.plant_choice = self.plant_choice_image = None
+            elif cell.plant(self.plant_choice, self.suns_group, self.projectiles):
+                # Else plant
+                self.menubar.lock_card(self.plant_choice)
+                self.suns -= self.plant_choice.sunCost
                 self.plant_choice = self.plant_choice_image = None
 
     def drop_sun(self):
@@ -144,9 +149,9 @@ class GameLocation(Location):
         This method is called periodically through custom pygame event
         Drops sun in random place on random height
         """
-        max_y = random.randint(sizes["win"][1] // 3, sizes["win"][1] * 2 // 3)
-        x = random.randint(sizes["win"][0] // 10, sizes["win"][0] * 9 // 10)
-        self.suns_group.add(Sun(x, sizes["topmenu"][1], max_y))
+        max_y = random.randint(c.sizes["win"][1] // 3, c.sizes["win"][1] * 2 // 3)
+        x = random.randint(c.sizes["win"][0] // 10, c.sizes["win"][0] * 9 // 10)
+        self.suns_group.add(Sun(x, c.sizes["topmenu"][1], max_y))
 
     def projectile_collisions_check(self):
         """
@@ -162,7 +167,7 @@ class GameLocation(Location):
                 zombie.take_damage(projectile)
 
             # Checks for potato mine explosions
-            for cell in filter(lambda c: c.col == zombie.col,
+            for cell in filter(lambda ce: ce.col == zombie.col,
                                self.cells[zombie.row]):
                 plant = cell.planted.sprite
                 if plant.__class__.__name__ == "PotatoMine":
@@ -188,7 +193,7 @@ class GameLocation(Location):
                                       z.col in [col - 1, col, col + 1], self.zombies)
                                       )
 
-    def lawnmovers_update(self):
+    def lawnmowers_update(self):
         """
         Checks for zombie crossing the last cell
         If row lawnmover exists, make it run
@@ -197,22 +202,24 @@ class GameLocation(Location):
 
         for zombie in self.zombies:
             if zombie.col < 0:
-                landmover = self.lawnmovers[zombie.row]
-                if landmover is None:
+                lawnmower = self.lawnmovers[zombie.row]
+                if lawnmower is None:
                     self.lose()
                     return
-                landmover.run()
+                lawnmower.run()
 
-        for ind, landmover in enumerate(self.lawnmovers):
-            if landmover is None:
+        for ind, lawnmower in enumerate(self.lawnmovers):
+            if lawnmower is None:
                 continue
-            if landmover.update(self.screen):
+            if lawnmower.update(self.screen):
                 self.lawnmovers[ind] = None
+                continue
+            if not lawnmower.running:
                 continue
 
             for zombie in self.zombies:
-                if landmover.running and zombie.row == landmover.row and \
-                        landmover.rect.x > zombie.rect.x:
+                if zombie.row == lawnmower.row and \
+                        lawnmower.rect.x > zombie.rect.x:
                     zombie.kill()
 
     def zombie_targeting(self):
@@ -221,7 +228,7 @@ class GameLocation(Location):
         Makes zombie eat plant if so
         """
         for zombie in filter(lambda z: not z.busy(), self.zombies):
-            for cell in filter(lambda c: not c.isempty() and c.col == zombie.col,
+            for cell in filter(lambda ce: not ce.isempty() and ce.col == zombie.col,
                                self.cells[zombie.row]):
                 plant = cell.planted
                 zombie.change_target(plant)

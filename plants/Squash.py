@@ -1,7 +1,7 @@
-from .plant import Plant
+from ._plant import _Plant
 
 
-class Squash(Plant):
+class Squash(_Plant):
     shadow = None
 
     sunCost = 50

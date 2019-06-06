@@ -1,12 +1,10 @@
 import pygame
-from pygame.locals import *
 
-from config import sizes
-from misc import get_images_from_sprite_sheet, transform_image
-from .plant import Plant
+from misc import get_images_from_sprite_sheet
+from ._plant import _Plant
 
 
-class WallNut(Plant):
+class WallNut(_Plant):
     """
     Wall-Nut simply can absorb a lot of damage
     """
@@ -17,9 +15,8 @@ class WallNut(Plant):
 
     def __init__(self, cell):
         self.images, size = get_images_from_sprite_sheet("assets/plants/wallNut.png",
-                                                         1, 3, size=sizes["plant"], cycle=False)
-        super().__init__(cell, image=self.images[0],
-                         size=size)
+                                                         1, 3, cycle=False)
+        super().__init__(cell, image=self.images[0])
         self.max_health = self.health
 
     def update(self, screen):

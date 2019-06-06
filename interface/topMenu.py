@@ -1,7 +1,7 @@
 import pygame
 
-from config import pads, sizes
-from sprites import Sprite, Shovel
+import config as c
+from sprites import Shovel, Sprite
 from .card import Card
 
 
@@ -24,18 +24,18 @@ class TopMenu:
         # Main frame
         self.frame = Sprite(pos, 0,
                             image=pygame.image.load("assets/misc/topmenu.png").convert_alpha(),
-                            size=sizes["topmenu"])
+                            size=c.sizes["topmenu"])
         # Positions cards
         self.cards = pygame.sprite.Group()
-        self.x = pads["sun"][0] + (pads["menubar"][0] if self.get_preparing() else 0)
+        self.x = c.pads["sun"][0] + (c.pads["menubar"][0] if self.get_preparing() else 0)
         self.starting_x = self.x
         for card in cards:
             image = pygame.image.load(f"assets/cards/card{card.__name__}.png").convert()
-            s = Card(self.x, card, image=image, size=sizes["card"])
+            s = Card(self.x, card, image=image, size=c.sizes["card"])
             self.cards.add(s)
-            self.x += sizes["card"][0] + pads["cards"]
+            self.x += c.sizes["card"][0] + c.pads["cards"]
 
-        self.shovel = Shovel(sizes["topmenu"][0] + pads["menubar"][0], 0)
+        self.shovel = Shovel(c.sizes["topmenu"][0] + c.pads["menubar"][0], 0)
 
     def update(self, screen, sun: int):
         """
@@ -47,13 +47,13 @@ class TopMenu:
         self.frame.update(screen)
         self.cards.update(screen, sun if self.get_preparing() else float("inf"))
 
-        score_digits = list(map(lambda digit: self.digits[digit], str(sun)))
-        digit_widths = list(map(lambda image: image.get_width(), score_digits))
+        score_digits = list(map(lambda d: self.digits[d], str(sun)))
+        digit_widths = list(map(lambda i: i.get_width(), score_digits))
 
-        offset = (pads["sun"][0] - sum(digit_widths)) // 2 + (
-            pads["menubar"][0] if self.get_preparing() else 0)
+        offset = (c.pads["sun"][0] - sum(digit_widths)) // 2 + (
+            c.pads["menubar"][0] if self.get_preparing() else 0)
         for image, width in zip(score_digits, digit_widths):
-            screen.blit(image, (offset, pads["sun"][1]))
+            screen.blit(image, (offset, c.pads["sun"][1]))
             offset += width
         if self.get_preparing() and not self.shovel.taken:
             self.shovel.update(screen)
@@ -80,6 +80,8 @@ class TopMenu:
                 # Last choice deletion
                 if choice == previous_choice:
                     return None
+                if previous_choice.__class__.__name__ == "Shovel":
+                    previous_choice.put_back()
                 if suns >= choice.sunCost:
                     return choice
         return previous_choice
@@ -96,8 +98,8 @@ class TopMenu:
             return
         s = Card(self.x,
                  image=pygame.image.load(f"assets/cards/card{plant.__name__}.png").convert(),
-                 size=sizes["card"], plant=plant)
-        self.x += sizes["card"][0] + pads["cards"]
+                 size=c.sizes["card"], plant=plant)
+        self.x += c.sizes["card"][0] + c.pads["cards"]
         self.cards.add(s)
 
     def remove_card(self, mouse_pos: tuple):
@@ -110,10 +112,11 @@ class TopMenu:
             if card.rect.collidepoint(mouse_pos):
                 card.sound.play()
                 self.cards.remove(card)
+                # Reposition cards
                 x = self.starting_x
                 for card in self.cards:
                     card.rect.x = x
-                    x += sizes["card"][0] + pads["cards"]
+                    x += c.sizes["card"][0] + c.pads["cards"]
                 self.x = x
                 return
 
@@ -123,7 +126,7 @@ class TopMenu:
         To remove gap
         :return: None
         """
-        dx = pads["menubar"][0]
+        dx = c.pads["menubar"][0]
 
         self.x += dx
         for card in self.cards:

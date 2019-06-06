@@ -1,6 +1,6 @@
 import pygame
 
-from config import fps
+import config as c
 from misc import greyscale
 from sprites import Sprite
 
@@ -20,12 +20,11 @@ class Card(Sprite):
         self.negative = greyscale(self.image)
         self.counter = 0
 
-    def update(self, screen, sun):
-
-        if self.counter:
+    def update(self, screen: pygame.Surface, sun: int):
+        if self.counter:  # Partly - colored image
             self.counter -= 1
             neg = self.negative.copy()
-            y = int(self.image.get_height() * (self.counter / (self.plant.recharge * fps)))
+            y = int(self.image.get_height() * (self.counter / (self.plant.recharge * c.fps)))
             rect = (0, y, self.image.get_width(), self.image.get_height() - y)
             col = pygame.Surface((rect[2], rect[3]))
             col.blit(self.image, (rect[0], -rect[1]))
@@ -45,4 +44,8 @@ class Card(Sprite):
             return self.plant
 
     def set_timer(self):
-        self.counter = self.plant.recharge * fps
+        """
+        Sets timer on displaying partly colored image
+        :return:
+        """
+        self.counter = self.plant.recharge * c.fps

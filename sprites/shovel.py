@@ -1,6 +1,6 @@
 import pygame
 
-from config import sizes
+import config as c
 from .sprite import Sprite
 
 
@@ -12,7 +12,7 @@ class Shovel(Sprite):
     def __init__(self, x: int, y: int):
         super().__init__(x + 10, y + 10,
                          image=pygame.image.load("assets/misc/shovel.png").convert_alpha(),
-                         size=sizes["cell"])
+                         size=c.sizes["cell"])
         self.starting_pos = (x, y)
         self.taken = False
 

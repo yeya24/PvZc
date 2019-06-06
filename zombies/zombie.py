@@ -3,7 +3,7 @@ import random
 import pygame
 from pygame.locals import *
 
-from config import fps, pads, sizes, XCells
+import config as c
 from misc import get_images_from_sprite_sheet, lcm, transform_image
 from sprites import Sprite
 
@@ -13,25 +13,29 @@ class Zombie(Sprite):
     Complex base class for zombies
     """
     # Animation speed
-    animation_frame = fps / 10
+    animation_frame = c.fps / 10
     counter = 0
     # Characteristics
     health = 200
     speed = 0.23
     damage = 100
-    reload = fps
+    reload = c.fps
 
-    groan = 9 * fps
+    groan = 9 * c.fps
 
-    def __init__(self, row, images, size):
+    def __init__(self, row, images, size=None):
         super().__init__(
-            sizes["win"][0],  # Right after the screen edge
-            pads["game"][1] + (row - 3 / 4) * sizes["cell"][1],
+            c.sizes["win"][0],  # Right after the screen edge
+            c.pads["game"][1] + (row - 3 / 4) * c.sizes["cell"][1],
             image=next(images), size=size
         )
-        # Animation
+        # --------------Animation--------------
+        # Burn animation
+        self.ignited, _ = get_images_from_sprite_sheet("assets/zombies/incinerated.png",
+                                                       6, 5, size=c.sizes["zombie"])
+        self.incinerated = False
         # Infinite iterator with images
-        # So image update can be easily called with next func
+        # So image update can be easily called with next() func
         self.images = images
         # Real x pos, while rect x is floored
         self.x = self.rect.x
@@ -44,30 +48,25 @@ class Zombie(Sprite):
         # After being shot makes nex image lighter
         self.shot = False
         # Game position
-        self.col = XCells + 1
+        self.col = c.XCells + 1
         self.row = row
-        # Sounds
-        self.chomps = [
+        # --------------Sounds--------------
+        self.chomps = (
             pygame.mixer.Sound("assets/audio/chomp.wav"),
             pygame.mixer.Sound("assets/audio/chomp2.wav"),
             pygame.mixer.Sound("assets/audio/chompsoft.wav")
-        ]
-        self.groans = [
+        )
+        self.groans = (
             pygame.mixer.Sound("assets/audio/groan.wav"),
             pygame.mixer.Sound("assets/audio/groan2.wav"),
             pygame.mixer.Sound("assets/audio/groan3.wav"),
             pygame.mixer.Sound("assets/audio/groan4.wav"),
             pygame.mixer.Sound("assets/audio/groan5.wav"),
             pygame.mixer.Sound("assets/audio/groan6.wav"),
-
-        ]
+        )
         self.frozen_sound = pygame.mixer.Sound("assets/audio/frozen.wav")
         self.frozen_sound.set_volume(0.6)
         random.choice(self.groans).play()
-        # Burn animation
-        self.ignited, _ = get_images_from_sprite_sheet("assets/zombies/incinerated.png",
-                                                       6, 5, size=sizes["zombie"])
-        self.incinerated = False
 
     def update(self, screen):
         """
@@ -80,7 +79,7 @@ class Zombie(Sprite):
         :param screen: pygame.display
         :return: None
         """
-
+        # Placed separately not to over complicate if/else statements
         if self.incinerated:
             self.incinerated -= 1
             if self.incinerated % self.animation_frame == 0:
@@ -126,8 +125,29 @@ class Zombie(Sprite):
 
         self.counter %= lcm(self.reload, self.animation_frame, self.groan)
         # Update cell on the game field
-        self.col = int((self.rect.x - pads["game"][0] + sizes["cell"][0] / 2) // sizes["cell"][0])
+        self.col = int((self.rect.x - c.pads["game"][0] + c.sizes["cell"][0] / 2)
+                       // c.sizes["cell"][0])
         self._draw(screen)
+
+    def take_damage(self, bullet):
+        """
+        Takes damage from bullet and removes it
+        Also makes self image blue if projectile.__class__ == SnowProjectile
+        :param bullet: Projectile
+        :return: None
+        """
+        bullet.deal_damage(self)
+        self.check_alive()
+        bullet.kill()
+
+        if bullet.__class__.__name__ == "SnowProjectile":
+            self.frozen = bullet.freeze_time
+            # Freezes zombie
+            self.image = transform_image(self.image, r=0, g=0, b=128, alpha=5,
+                                         special_flag=BLEND_RGBA_ADD)
+            self.frozen_sound.play()
+
+        self.shot = True
 
     def busy(self) -> bool:
         """
@@ -158,26 +178,6 @@ class Zombie(Sprite):
         """
         if self.health <= 0:
             self.kill()
-
-    def take_damage(self, bullet):
-        """
-        Takes damage from bullet and removes it
-        Also makes self image blue if projectile.__class__ == SnowProjectile
-        :param bullet: Projectile
-        :return: None
-        """
-        bullet.deal_damage(self)
-        self.check_alive()
-        bullet.kill()
-
-        if bullet.__class__.__name__ == "SnowProjectile":
-            self.frozen = bullet.freeze_time
-            # "Замораживает" зомби - делает изображение синим начиная с текущего
-            self.image = transform_image(self.image, r=0, g=0, b=128, alpha=5,
-                                         special_flag=BLEND_RGBA_ADD)
-            self.frozen_sound.play()
-
-        self.shot = True
 
     def deal_damage(self):
         """

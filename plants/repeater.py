@@ -1,12 +1,12 @@
 import pygame
 
-from config import fps, sizes
+import config as c
 from misc import get_images_from_sprite_sheet, lcm
-from projectiles import PeashooterProjectile
-from .plant import Plant
+from ._plant import _Plant
+from .peaShooter import PeaShooter
 
 
-class Repeater(Plant):
+class Repeater(_Plant):
     """
     Repeater is better peashooter which shoots two peas in a row
     """
@@ -15,14 +15,14 @@ class Repeater(Plant):
     sunCost = 200
     health = 300
     recharge = 5
-    reload = fps * 1.5
+    reload = c.fps * 1.5
     damage = 20
 
     def __init__(self, cell, projectiles):
-        images, size = get_images_from_sprite_sheet("assets/plants/repeater.png",
-                                                    14, 3, size=sizes["plant"])
-        super().__init__(cell, anim_speed=fps // 20,
-                         images=images, size=size)
+        images, _ = get_images_from_sprite_sheet("assets/plants/repeater.png",
+                                                 14, 3, size=c.sizes["plant"])
+        _Plant.__init__(self, cell, anim_speed=c.fps // 20,
+                        images=images)
         self.projectiles = projectiles
         self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
 
@@ -31,19 +31,12 @@ class Repeater(Plant):
         if self.counter % self.animation_frame == 0:
             self.image = next(self.images)
         if self.counter % self.reload == 0:  # First shot
-            self.shot()
-        elif (self.counter - 10) % self.reload == 0:  # Second shot
-            self.shot()
+            self.act()
+        elif (self.counter - c.time_repeater_second_shot) % self.reload == 0:  # Second shot
+            self.act()
 
-        self.counter %= lcm(self.reload, self.reload + 10, self.animation_frame)
+        self.counter %= lcm(self.reload, self.reload + c.time_repeater_second_shot,
+                            self.animation_frame)
         self._draw(screen)
 
-    def shot(self):
-        """
-        Creates PeashooterBullet object
-        and adds it to the location projectiles group
-        :return: None
-        """
-        b = PeashooterProjectile(*self.rect.midtop, self.coords[0])
-        self.projectiles.add(b)
-        self.shot_sound.play()
+    act = PeaShooter.act

@@ -1,5 +1,5 @@
-from .plant import Plant
+from ._plant import _Plant
 
 
-class Jalapeno(Plant):
+class Jalapeno(_Plant):
     pass

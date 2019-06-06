@@ -1,12 +1,12 @@
 import pygame
 
-from config import fps, sizes
-from misc import get_images_from_sprite_sheet, lcm
+import config as c
+from misc import get_images_from_sprite_sheet
 from projectiles import PeashooterProjectile
-from .plant import Plant
+from ._plant import _Plant
 
 
-class PeaShooter(Plant):
+class PeaShooter(_Plant):
     """
     The most basic plant which shoots peas
     """
@@ -16,28 +16,18 @@ class PeaShooter(Plant):
     health = 300
     recharge = 5
     damage = 20
-    reload = fps * 1.5
+    reload = c.fps * 1.5
 
     def __init__(self, cell, projectiles: pygame.sprite.Group):
         images, size = get_images_from_sprite_sheet("assets/plants/peaShooter.png",
-                                                    13, 3, size=sizes["plant"])
-        super().__init__(cell, anim_speed=fps // 30,
+                                                    13, 3, size=c.sizes["plant"])
+        super().__init__(cell, anim_speed=c.fps // 30,
                          images=images, size=size)
         self.projectiles = projectiles
 
         self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
 
-    def update(self, screen):
-        self.counter += 1
-        if self.counter % self.animation_frame == 0:
-            self.image = next(self.images)
-        if self.counter % self.reload == 0:
-            self.shot()
-
-        self.counter %= lcm(self.reload * self.animation_frame)
-        self._draw(screen)
-
-    def shot(self):
+    def act(self):
         """
         Creates PeashooterBullet object
         and adds it to the location projectiles group

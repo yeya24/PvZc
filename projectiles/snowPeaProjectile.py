@@ -1,10 +1,10 @@
 import pygame
 
 from config import fps, sizes
-from .projectile import Projectile
+from ._projectile import _Projectile
 
 
-class SnowProjectile(Projectile):
+class SnowProjectile(_Projectile):
     """
     Modified PeashooterProjectile
     which deals 20 damage and also freezes enemy

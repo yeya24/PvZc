@@ -1,12 +1,12 @@
 import pygame
 
-from config import fps, sizes
-from misc import get_images_from_sprite_sheet, lcm
+import config as c
+from misc import get_images_from_sprite_sheet
 from projectiles import SnowProjectile
-from .plant import Plant
+from ._plant import _Plant
 
 
-class SnowPea(Plant):
+class SnowPea(_Plant):
     """
     Snow pea is a peashooter which shoots freezing projectiles
     """
@@ -15,28 +15,18 @@ class SnowPea(Plant):
     sunCost = 175
     health = 300
     recharge = 5
-    reload = 1.5 * fps
+    reload = 1.5 * c.fps
     damage = 20
 
     def __init__(self, cell, projectiles):
-        images, size = get_images_from_sprite_sheet("assets/plants/snowPea.png",
-                                                    7, 3, size=sizes["plant"])
-        super().__init__(cell, anim_speed=fps // 20,
-                         images=images, size=size)
+        images, _ = get_images_from_sprite_sheet("assets/plants/snowPea.png",
+                                                 7, 3, size=c.sizes["plant"])
+        super().__init__(cell, anim_speed=c.fps // 20,
+                         images=images)
         self.projectiles = projectiles
         self.shot_sound = pygame.mixer.Sound("assets/audio/throw.wav")
 
-    def update(self, screen):
-        self.counter += 1
-        if self.counter % self.animation_frame == 0:
-            self.image = next(self.images)
-        if self.counter % self.reload == 0:
-            self.shot()
-
-        self.counter %= lcm(self.reload, self.animation_frame)
-        self._draw(screen)
-
-    def shot(self):
+    def act(self):
         """
         Creates SnowProjectile object
         and adds it to the location projectiles group

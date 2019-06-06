@@ -2,14 +2,15 @@ import random
 
 import pygame
 
-from config import sizes
+import config as c
 from sprites import Sprite
 
 
-class Projectile(Sprite):
+class _Projectile(Sprite):
     """
     Base class for pea shooting plants' projectiles
     """
+
     def __init__(self, x: int, y: int, row: int,
                  speed: float, damage: int,
                  image: pygame.Surface, size: tuple = None):
@@ -39,5 +40,5 @@ class Projectile(Sprite):
         """
         self.rect.x += self.speed
         self._draw(screen)
-        if self.rect.x >= sizes["win"][0]:
+        if self.rect.x >= c.sizes["win"][0]:
             self.kill()

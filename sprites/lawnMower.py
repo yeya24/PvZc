@@ -1,6 +1,6 @@
 import pygame
 
-from config import pads, sizes
+import config as c
 from .sprite import Sprite
 
 
@@ -15,9 +15,9 @@ class LawnMower(Sprite):
     def __init__(self, row: int):
         image = pygame.image.load("assets/misc/lawnMover.png").convert_alpha()
         super().__init__(
-            pads["game"][0] - image.get_width() / 2,
-            pads["game"][1] + sizes["cell"][1] * (row + 1 / 4),
-            image=image, size=sizes["lawnmover"]
+            c.pads["game"][0] - image.get_width() / 2,
+            c.pads["game"][1] + c.sizes["cell"][1] * (row + 1 / 4),
+            image=image, size=c.sizes["lawnmover"]
         )
         self.row = row
         self.running = False
@@ -31,7 +31,7 @@ class LawnMower(Sprite):
         :return : bool
         """
         if self.running:
-            if self.rect.x > sizes["win"][0]:
+            if self.rect.x > c.sizes["win"][0]:
                 return True
 
             self.rect.x += self.speedX

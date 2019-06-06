@@ -1,7 +1,7 @@
 import pygame
 
 
-class Location:
+class _Location:
     parent = None
 
     def __init__(self, parent):

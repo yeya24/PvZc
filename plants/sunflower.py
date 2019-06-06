@@ -1,12 +1,12 @@
 import pygame
 
-from config import fps, sizes
-from misc import get_images_from_sprite_sheet, lcm
+import config as c
+from misc import get_images_from_sprite_sheet
 from sprites import Sun
-from .plant import Plant
+from ._plant import _Plant
 
 
-class Sunflower(Plant):
+class Sunflower(_Plant):
     """
     Sunflower drops suns
     """
@@ -15,29 +15,19 @@ class Sunflower(Plant):
     sunCost = 50
     health = 300
     recharge = 5
-    reload = fps * 24
+    reload = c.fps * 24
 
     def __init__(self, cell, suns_group):
         images, size = get_images_from_sprite_sheet("assets/plants/sunflower.png",
-                                                    18, 3, size=sizes["plant"])
-        super().__init__(cell, anim_speed=fps // 20,
-                         images=images, size=size)
+                                                    18, 3, size=c.sizes["plant"])
+        super().__init__(cell, anim_speed=c.fps // 20,
+                         images=images)
         self.suns_group = suns_group
-        self.counter = fps * 17
+        self.counter = c.fps * 17  # First sun drop is faster
 
         self.sun_sound = pygame.mixer.Sound("assets/audio/throw.wav")
 
-    def update(self, screen):
-        self.counter += 1
-        if self.counter % self.animation_frame == 0:
-            self.image = next(self.images)
-        if self.counter % self.reload == 0:
-            self.generate_sun()
-
-        self.counter %= lcm(self.reload, self.animation_frame)
-        self._draw(screen)
-
-    def generate_sun(self):
+    def act(self):
         """
         Creates Sun object
         and adds it to the location projectiles group

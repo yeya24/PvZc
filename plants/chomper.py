@@ -1,28 +1,28 @@
 import pygame
 
-from config import fps, sizes
+import config as c
 from misc import get_images_from_sprite_sheet
-from .plant import Plant
+from ._plant import _Plant
 
 
-class Chomper(Plant):
+class Chomper(_Plant):
     shadow = pygame.image.load("assets/plants/chomper_.png")
 
     sunCost = 150
     health = 300
     recharge = 5
-    reload = fps * 42
+    reload = c.fps * 42
 
     def __init__(self, cell):
-        images, size = get_images_from_sprite_sheet("assets/plants/chomper.png",
-                                                    31, 1, size=sizes["plant"])
+        images, _ = get_images_from_sprite_sheet("assets/plants/chomper.png",
+                                                 31, 1, size=c.sizes["plant"])
         super().__init__(cell, anim_speed=2,
-                         images=images, size=size)
+                         images=images)
 
         self.catching_animation, _ = get_images_from_sprite_sheet("assets/plants/chomperCatch.png",
                                                                   4, 5, ratio=0.75)
         self.eating_animation, _ = get_images_from_sprite_sheet("assets/plants/chomperEating.png",
-                                                                6, 3, size=sizes["plant"])
+                                                                6, 3, size=c.sizes["plant"])
         self.chop_sound = pygame.mixer.Sound("assets/audio/Bigchomp.ogg")
         self.eating = self.catching = self.reload_count = False
         self.target = None
@@ -51,8 +51,7 @@ class Chomper(Plant):
                     self.eating = 2
                     self.target.kill()
 
-            else:
-                # Usual state
+            else:  # Usual state
                 self.image = next(self.images)
 
         self.counter %= self.animation_frame

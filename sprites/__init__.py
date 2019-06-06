@@ -1,4 +1,6 @@
 from .lawnMower import LawnMower
+from .shovel import Shovel
 from .sprite import Sprite
 from .sun import Sun
-from .shovel import Shovel
+
+__all__ = ["LawnMower", "Sprite", "Sun", "Shovel"]

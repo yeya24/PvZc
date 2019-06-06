@@ -1,14 +1,15 @@
 import pygame
 from pygame.locals import *
 
-from config import sizes, starting_sun
+import config as c
 from interface import PlantChoiceMenu, TopMenu
+from plants import *
 from sprites import Sprite
+from ._location import _Location
 from .gameLocation import GameLocation
-from .location import Location
 
 
-class LevelPreparationLocation(Location):
+class LevelPreparationLocation(_Location):
     def __init__(self, parent):
         super().__init__(parent)
         # Location music
@@ -18,10 +19,9 @@ class LevelPreparationLocation(Location):
         self.bg = Sprite(0, 0,
                          image=pygame.image.load("assets/misc/bg.png").convert())
         # At the begging camera moves to the right side of background
-        self.move_times = (self.bg.image.get_width() - sizes["win"][0]) / 5
-        from plants import PeaShooter, Sunflower, PotatoMine, WallNut, SnowPea, Chomper, CherryBomb, Repeater
+        self.move_times = (self.bg.image.get_width() - c.sizes["win"][0]) / 5
         # Card choices
-        self.plant_choice_widget = PlantChoiceMenu(
+        self.plant_choice_widget = PlantChoiceMenu(  # Contains all working plants
             [PotatoMine, Sunflower, SnowPea, CherryBomb, Chomper, Repeater, WallNut, PeaShooter])
         # Menu which usually displays suns and chosen cards
         # New cards added here
@@ -49,27 +49,24 @@ class LevelPreparationLocation(Location):
         self.bg.update(self.screen)
         if not self.move_times and not self.counter:
             self.plant_choice_widget.update(self.screen, pygame.mouse.get_pos())
-            self.top_menu.update(self.screen, starting_sun)
+            self.top_menu.update(self.screen, c.starting_sun)
         elif self.counter:
             self.counter += 1
             image = None
-            if self.counter >= 100:  # Change game location on game
-                data = object  # Level data
+            if self.counter >= c.time_afterRSP:  # Change game location on game
                 self.top_menu.move_right()
                 self.parent.change_location(
-                    GameLocation(self, data, self.top_menu))
+                    GameLocation(self, self.top_menu))
             # Ready Set Plant messages
-            elif self.counter >= 80:
-                image = self.ready_set_plant_images[2]
-            elif self.counter >= 40:
-                image = self.ready_set_plant_images[1]
-            elif self.counter >= 5:
-                image = self.ready_set_plant_images[0]
+            for i, time in enumerate(c.time_readySetPlant):
+                if self.counter >= time:
+                    image = self.ready_set_plant_images[2 - i]
+                    break
 
             if image is not None:
                 self.screen.blit(image,
-                                 ((sizes["win"][0] - image.get_width()) / 2,
-                                  (sizes["win"][1] - image.get_height()) / 2))
+                                 ((c.sizes["win"][0] - image.get_width()) / 2,
+                                  (c.sizes["win"][1] - image.get_height()) / 2))
 
     def event(self, event):
         if event.type == MOUSEBUTTONUP and event.button == 1:
@@ -81,4 +78,5 @@ class LevelPreparationLocation(Location):
                 self.top_menu.add_card(choice)
 
             if self.plant_choice_widget.button_click(mouse_pos):
-                self.move_times = -(self.bg.image.get_width() - sizes["win"][0] - 220) / 5
+                self.move_times = -(self.bg.image.get_width() - c.sizes["win"][0]
+                                    - c.pads["game"][0]) // 5

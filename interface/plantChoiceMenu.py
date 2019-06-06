@@ -1,18 +1,18 @@
 import pygame
 
-from config import pads, sizes
+import config as c
 from sprites import Sprite
 from .card import Card
 
 
 class PlantChoiceMenu:
     def __init__(self, cards):
-        self.frame = Sprite(0, sizes["topmenu"][1],
+        self.frame = Sprite(0, c.sizes["topmenu"][1],
                             image=pygame.image.load(
                                 "assets/misc/chooseYourPlants.png").convert_alpha(),
-                            size=sizes["choose"])
+                            size=c.sizes["choose"])
         self.button_images = list(
-            map(lambda image: pygame.transform.smoothscale(image, sizes["letsRock"]), [
+            map(lambda i: pygame.transform.smoothscale(i, c.sizes["letsRock"]), [
                 pygame.image.load("assets/misc/letsRock.png").convert_alpha(),
                 pygame.image.load("assets/misc/letsRockHighlight.png").convert_alpha()
             ])
@@ -20,19 +20,19 @@ class PlantChoiceMenu:
         self.button = Sprite(158, 568, image=self.button_images[0])
 
         self.cards = pygame.sprite.Group()
-        self.x = pads["choose"][0]
+        self.x = c.pads["choose"][0]
         self.starting_x = self.x
-        y = pads["choose"][1]
-        c = 0
+        y = c.pads["choose"][1]
+        _c = 0
         for card in cards:
-            c += 1
+            _c += 1
             image = pygame.image.load(f"assets/cards/card{card.__name__}.png").convert()
-            s = Card(self.x, card, image=image, size=sizes["card"], y=y)
+            s = Card(self.x, card, image=image, size=c.sizes["card"], y=y)
             self.cards.add(s)
-            self.x += sizes["card"][0] + 2
-            if c % 7 == 0:
+            self.x += c.sizes["card"][0] + 2
+            if _c % 7 == 0:
                 self.x = self.starting_x
-                y += sizes["card"][1] + 5
+                y += c.sizes["card"][1] + 5
 
     def update(self, screen, mouse_pos):
         """

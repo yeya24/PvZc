@@ -1,11 +1,11 @@
 import pygame
 
-from config import fps, sizes
+import config as c
 from misc import get_images_from_sprite_sheet
-from .plant import Plant
+from ._plant import _Plant
 
 
-class PotatoMine(Plant):
+class PotatoMine(_Plant):
     """
     Potato mine explodes with giant damage
      after being armed for several seconds
@@ -16,20 +16,19 @@ class PotatoMine(Plant):
     health = 300
     recharge = 20
     damage = 1800
-    reload = fps * 14
+    reload = c.fps * 14
 
     def __init__(self, cell):
         self.images, _ = get_images_from_sprite_sheet("assets/plants/potatoMineReady.png",
                                                       7, 4)
-        self.arming, size = get_images_from_sprite_sheet("assets/plants/potatoMineArming.png",
-                                                         1, 3, size=sizes["plant"], cycle=False)
+        self.arming, _ = get_images_from_sprite_sheet("assets/plants/potatoMineArming.png",
+                                                      1, 3, size=c.sizes["plant"], cycle=False)
         self.explosion = pygame.transform.smoothscale(
             pygame.image.load("assets/plants/potatoMineExplosion.png").convert_alpha(),
-            sizes["potatoExp"])
+            c.sizes["potatoExp"])
         super().__init__(cell,
-                         anim_speed=fps // 12,
-                         image=self.arming[0],
-                         size=size)
+                         anim_speed=c.fps // 12,
+                         image=self.arming[0])
         self.armed = False
         self.detonation = 60
         self.detonation_sound = pygame.mixer.Sound("assets/audio/potato_mine.wav")
@@ -65,8 +64,8 @@ class PotatoMine(Plant):
         """
         self.image = self.explosion
         # Configure image position
-        self.rect.x -= (sizes["potatoExp"][0] - sizes["cell"][0]) // 2
-        self.rect.y -= (sizes["potatoExp"][1] - sizes["cell"][1]) // 1.2
+        self.rect.x -= (c.sizes["potatoExp"][0] - c.sizes["cell"][0]) // 2
+        self.rect.y -= (c.sizes["potatoExp"][1] - c.sizes["cell"][1]) // 1.2
         enemy.health -= self.damage
         enemy.check_alive()
         self.health = 0  # Start displaying explosion

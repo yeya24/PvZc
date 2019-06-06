@@ -1,11 +1,11 @@
 import pygame
 
-from config import fps
+import config as c
 from misc import get_images_from_sprite_sheet
-from .plant import Plant
+from ._plant import _Plant
 
 
-class CherryBomb(Plant):
+class CherryBomb(_Plant):
     """
     Cherry bomb explodes in the 3 cell diameter
     """
@@ -15,14 +15,18 @@ class CherryBomb(Plant):
     health = 200
     recharge = 35
     damage = 1800
-    reload = fps
+    reload = c.fps
+
+    @classmethod
+    def get_shadow(cls):
+        return cls.shadow
 
     def __init__(self, cell):
         images, size = get_images_from_sprite_sheet("assets/plants/cherryBomb.png",
                                                     6, 3, ratio=0.9)
         self.explosion, _ = get_images_from_sprite_sheet("assets/plants/cherryBombExplosion.png",
                                                          17, 1)
-        super().__init__(cell, anim_speed=fps // 30,
+        super().__init__(cell, anim_speed=c.fps // 30,
                          images=images, size=size)
         self.explode_sound = pygame.mixer.Sound("assets/audio/cherrybomb.wav")
 
@@ -59,7 +63,3 @@ class CherryBomb(Plant):
         self.images = self.explosion
         self.health = self.counter = 0
         self.explode_sound.play()
-
-    @classmethod
-    def get_shadow(cls):
-        return cls.shadow
