@@ -16,7 +16,7 @@ class GameLocation(_Location):
         super().__init__(parent)
         # Game interface
         self.plant_choice = self.plant_choice_image = None
-        self.suns = c.starting_sun + 2000
+        self.suns = c.starting_sun
         # Sprite groups for different game objects
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()
@@ -136,6 +136,7 @@ class GameLocation(_Location):
             if self.plant_choice.__class__.__name__ == "Shovel":
                 # If player is using shovel remove plant
                 if cell.remove_plant():
+                    self.suns += cell.sun
                     self.plant_choice.put_back()
                     self.plant_choice = self.plant_choice_image = None
             elif cell.plant(self.plant_choice, self.suns_group, self.projectiles):

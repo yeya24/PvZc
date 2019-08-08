@@ -15,7 +15,7 @@ class MainMenuLocation(_Location):
         self.bg = Sprite(0, 0,
                          image=pygame.image.load("assets/misc/mainMenu.png").convert(),
                          size=c.sizes["win"])
-        pygame.mixer.music.load("assets/audio/intro.mp3")
+        pygame.mixer.music.load("assets/audio/Intro.mp3")
         pygame.mixer.music.play(-1)
         self.play_button = Button(c.pads["play"],
                                   pygame.image.load(

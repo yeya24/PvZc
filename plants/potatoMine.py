@@ -14,7 +14,7 @@ class PotatoMine(_Plant):
 
     sunCost = 25
     health = 300
-    recharge = 20
+    recharge = 1
     damage = 1800
     reload = c.fps * 14
 

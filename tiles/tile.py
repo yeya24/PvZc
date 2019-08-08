@@ -41,6 +41,7 @@ class Tile(Sprite):
                 self.planted.add(plant(self))
             else:
                 self.planted.add(plant(self, projectiles))
+            self.sun = int(plant.sunCost / 5)
             self.plant_sound.play()
             return True
         return False
