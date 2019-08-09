@@ -16,7 +16,7 @@ class GameLocation(_Location):
         super().__init__(parent)
         # Game interface
         self.plant_choice = self.plant_choice_image = None
-        self.suns = c.starting_sun
+        self.suns = c.starting_sun + 10000
         # Sprite groups for different game objects
         self.suns_group = pygame.sprite.Group()
         self.zombies = pygame.sprite.Group()

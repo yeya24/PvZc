@@ -5,7 +5,7 @@ from pygame.locals import *
 
 import config as c
 from interface import Button
-from sprite import Sprite
+from sprites import Sprite
 from ._location import _Location
 
 
